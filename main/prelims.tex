@@ -1,27 +1,23 @@
 \chapter{Preliminaries}
 \label{chap:prelims}
 
-A preliminaries chapter is not necessary, but it may be a good idea to use it for presenting your theoretical/mathematical framework in a more detailed and technical way than the introduction, and to perhaps establish some basic lemmata/observations common to multiple chapters of your thesis.
+We consider a shared memory model, where a finite number of threads execute \emph{operations} on shared \emph{objects}. An operation consists of an \emph{invocation} and a matching \emph{response}. A \emph{history} \(\mathnormal{H}\) is a finite sequence of operation invocation and response steps. A history \(\mathnormal{H}\) defines a partial order \(\prec_\mathnormal{H}\) on operations: Given operations \(op\) and \(op'\), \(op \prec_H op'\) if and only if \(response(op)\) precedes \(invocation(op')\) in \(\mathnormal{H}\). Two operations that do not precede each other are \emph{concurrent}. In a \emph{sequential history}, there are no concurrent operations. An object is specified using a \emph{sequential specification} $\mathcal{H}$, which is the set of its allowed sequential histories.
+An operation \emph{op} is \emph{complete} in a history \(\mathnormal{H}\) if both \(invocation(op)\) and its matching \(response(op)\) are in \(\mathnormal{H}\).
+A \emph{linearization} of a concurrent history \(\mathnormal{H}\), is a sequential history $H'$ such that: (1) $H' \in \mathcal{H}$, (2) $H'$ contains all completed operations and possibly additional non-complete ones, after adding matching responses, and, (3) $\prec_{H'}$ extends $\prec_H$. A correctness condition for randomized algorithms \emph{strong linearizability}~\cite{strong_linearizability}, defined as follows: 
 
-\section{Some section}
-
-Let's define some concept we'll be using throughout the thesis.
-
-\begin{definition}
-The \emph{von Neumann model} of a computer, also known as the \emph{Princeton architecture} is an architecture for digital computers, which consists of a processing units, containing an ALU and processing registers; a control unit consisting of an instruction register and a program counter; a memory unit which stores both data and instructions; and input-and-output mechanisms.
+\begin{definition}[strong linearizability]
+\label{def:strong_linearizability}
+A function \(f\) mapping executions to histories is \emph{prefix-preserving} if for any two executions $\sigma$, $\sigma$', where $\sigma$ is a prefix of $\sigma$', $f(\sigma)$ is a prefix of $f(\sigma')$. 
+An object A is \emph{strongly linearizable} if there is a prefix-preserving function \(f\) that maps every history \(\mathnormal{H}\) of $A$ to a linearization of \(\mathnormal{H}\).
 \end{definition}
 
-\section{Acronyms and abbreviations}
+Our algorithm is randomised and we consider a weak adversary that determines the scheduling without observing the coin-flips.
 
-Your thesis will typically have a set of significant terms, abbreviations and acronyms. Technion guidelines mandate that you place a list of these at the beginning of your thesis; and that they be defined upon first use. And, indeed, if you followed read this sample thesis carefuly thus far you should have seen ``\nameref{chap:notation-and-abbreviations}'' following the abstract.
+As previously mentioned, we adopt a flavor of \emph{relaxed semantics}, as defined in \cite{Henzinger_2013_Quantitative_Relaxation}:
 
-When writing your thesis, collect such terms and their corresponding definitions in the \texttt{front/abbrevs.tex} file --- using the commands \verb|\newacronym|,  \verb|\newabbreviation| and \verb|\newglossaryentry|; the latter command is used for symbols and short, but unabbreviated, terms.
-
-In the body of your thesis, your first use of a term will typically be where you want to also include the text of its definition. You don't need to repeat the definition you've already entered! Let's explain with an example: You've defined the term \gls{DIY} beforehand; when using it, you invoke the command \verb|\gls{DIY}|.\footnote{The 
-\texttt{\textbackslash{}gls} command originates in the \texttt{glossaries-extra} package, which is used to automate the handling of notation \& abbreviations.} This command does several things:
-\begin{itemize}
-	\item It ensures the term \gls{DIY} is included in the list of Notation \& Abbreviation, at the beginning of the thesis; the entry for the term will also include the page on which it first appears;
-	\item It produces the definition text; and finally
-	\item It adds the defined term --- \gls{DIY} --- in parentheses, after the definition.
-\end{itemize}
-In later invocations of \verb|\gls{DIY}|, only the short form (\gls{DIY}) will be printed, not the definition, and no parentheses. (This also means that if you move text around in your thesis you don't have to worry about defining on first use - that's already taken care of.) 
+\begin{definition}[$r$-relaxation] \label{def:def:r-relaxtion}
+A sequential history $H$ is an \emph{$r$-relaxation} of a sequential history H', if H is comprised of all but at most $r$ of the invocations in $H'$ and their responses,
+and each invocation in $H$ is preceded by all but at most $r$ of the invocations that precede the same invocation in $H'$.
+The $r$-relaxation of a sequential specification $\mathcal{H}$ is the set of histories that have $r$-relaxations in $\mathcal{H}$:
+\[{H}^r \triangleq \left\{ H' \mid \exists H \in \mathcal{H}: H \text{ is an } r\text{-relaxation of } H'\right\}. \]
+\end{definition}

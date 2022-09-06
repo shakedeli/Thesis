@@ -3,13 +3,98 @@
 % (regardless of its class and style files used),
 % e.g. package uses:
 
-%\usepackage{xspace}
+\usepackage{booktabs}   %% For formal tables:
+                        %% http://ctan.org/pkg/booktabs
+\usepackage{subcaption} %% For complex figures with subfigures/subcaptions
+                        %% http://ctan.org/pkg/subcaption
+\usepackage{xspace}
+\usepackage{libertine}
+\usepackage{balance}
+
+% \usepackage[utf8]{inputenc}
+\usepackage{enumitem}
+\usepackage{listings}
+% \usepackage{amsmath}
+
+%% Colors 
+\usepackage{xcolor}
+
+\usepackage[]{todonotes}
+
+%% Figures and Graphs Packages
+\usepackage{graphicx}% http://ctan.org/pkg/graphicx
+\usepackage{caption}
+\usepackage{float}
+% % \usepackage{placeins} 
+% \usepackage{flafter}
+% \usepackage{wrapfig}
+% \graphicspath{ {./graphics/sequential/}{./graphics/algorithm/}{./graphics/graphs/}{./graphics/} }
 
 % and macros/command defintions:
+\newcommand{\mysketch}{Quancurrent\xspace}
 
-%\newcommand{\complexityclass}[1]{{\bf #1}\xspace}
-%\newcommand{\NPTIME}{\complexityclass{NP}}
+% %% Pseudo-code: 
+% \usepackage{algpseudocode}
+\newcommand{\myvar}[1]{$\mathit{#1}$}
+\newcommand{\var}[1]{\mathit{#1}}
 
-% For this template, we'll only have one single command,
-% necessary for including graphics...
-\usepackage{graphicx}% http://ctan.org/pkg/graphicx
+% \algrenewcommand{\algorithmiccomment}[1]{{$\triangleright$}{#1}}
+% \algnewcommand{\LongComment}[1]{$\triangleright$ \begin{minipage}[t]{}#1\strut\end{minipage}}
+
+%Initializing counter to add continuously line numbers to algorithms
+\newcounter{mycounter}
+%Start of alg - \setcounter{ALG@line}{\value{mycounter}}
+%End of alg - \setcounter{mycounter}{\value{ALG@line}}
+\setcounter{mycounter}{0}
+
+
+
+% \algrenewcommand{\algorithmiccomment}[1]{\hfill\triangleright$ \eqparbox{}{#1}}
+% \algnewcommand{\LongComment}[1]{\hfill$\triangleright$ \begin{minipage}[t]{\eqboxwidth{}}#1\strut\end{minipage}}
+% \usepackage[ruled,linesnumbered,noresetcount]{algorithm2e}
+% \AtBeginEnvironment{algorithm}{\SetArgSty{textrm}} 
+% \newcommand\mycommfont[1]{\rmfamily{#1}}
+% \SetCommentSty{mycommfont}
+% \newcommand{\myvar}[1]{$\mathit{#1}$}
+% \newcommand{\var}[1]{\mathit{#1}}
+% \SetKwComment{Comment}{$\triangleright$\ }{}
+% \SetEndCharOfAlgoLine{}
+% \SetKwProg{Procedure}{Procedure}{:}{end}
+% \SetKwRepeat{Repeat}{do}{while}
+
+%Self-defined math commands 
+\newcommand{\s}{$\sigma$\xspace}
+\newcommand{\fs}{\(f(\sigma)\)\xspace}
+\newcommand{\fstag}{\(f(\sigma')\)\xspace}
+\newcommand{\ls}{\(l(\sigma)\)\xspace}
+\renewcommand{\S}{\(\mathnormal{S}\)\xspace}
+\newcommand{\Q}{\(\mathnormal{Q}\)\xspace}
+\renewcommand{\O}{\(\mathnormal{O}\)\xspace}
+\newcommand{\A}{$A=\mathcal{S}(f(\sigma))$\xspace}
+\renewcommand{\d}{\(\delta\)\xspace}
+
+
+%colors
+\newcommand{\inred}[1]{{\color{red} #1 }}
+\newcommand{\ingray}[1]{{\color{gray} #1 }}
+\newcommand{\indarkgray}[1]{{\color{darkgray} #1 }}
+\newcommand{\inblue}[1]{{\color{blue} #1 }}
+\newcommand{\todoredefined}[2][]{\todo[color=red, #1]{#2}}
+%Example:
+%\todoredefined[color=green]{Test of newly defined command, requesting a green color.}
+
+
+
+% bibliography 
+\bibliographystyle{ACM-Reference-Format}
+
+
+% HOW TO:
+
+% 1) Pseudocode: 
+% \begin{algorithm}[h]
+% \caption{} \label{alg:}
+% \begin{algorithmic}[1] 
+
+% \end{algorithmic}
+% \end{algorithm}

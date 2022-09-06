@@ -31,7 +31,7 @@
 %%   mostly bare-bones and the extras are here. Also, this file should work
 %%   with other document classes instead of report, e.g. scrreprt or memoir.
 %%   At least, it should with a few minor tweaks.
-%% - The order of \RequirePackage commands is singificant - some packages need
+%% - The order of \RequirePackage commands is significant - some packages need
 %%   to be loaded before others.
 %% - Initially, amsthm was used for theorem-like environments, and algorithmic
 %%   for algorithms. They have all sorts of issues, e.g. with Hebrew babel, so
@@ -89,14 +89,17 @@
 % cases (see rlbabel.def for details). With the workaround in place, we
 % can include the packages for algorithmicx:
 \RequirePackage{algorithmicx}
+\RequirePackage{algpseudocode}
+% \usepackage{algpseudocode}
+
 % this defines algorithmic-like statement commands
-\RequirePackage{algcompatible}
+% \RequirePackage{algcompatible}
 
 % both algorithmic and algorithmicx are used in conjunction with the
 % algorithm package, which is used for the outer float environment
 % {algorithm}, which has the caption and delimiting rules
 \RequirePackage[chapter]{algorithm}
-
+% \usepackage{algpseudocode}
 \providecommand*{\toclevel@algorithm}{0}
 
 % A mechanism for setting the font size in algorithms
@@ -503,7 +506,7 @@
  \newaliasedtheorem{observation}[lemma]{Observation}
 
  \theoremstyle{definition}
- \newaliasedtheorem{definition}[lemma]{Definition}
+ \newaliasedtheorem{definition}[lemma]{Definition}[chapter]
 
  \theoremstyle{remark}
  \newaliasedtheorem{example}[lemma]{Example}
@@ -719,6 +722,15 @@
 \showboxbreadth=50
 
 % -----------------------------------------------------------------
+
+\def\bibliographystyle#1{%
+  \ifx\@begindocumenthook\@undefined\else
+    \expandafter\AtBeginDocument
+  \fi
+    {\if@filesw
+       \immediate\write\@auxout{\string\bibstyle{#1}}%
+     \fi}}
+
 
 
 \endinput
