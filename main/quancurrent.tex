@@ -11,9 +11,9 @@ is given two memory addresses $addr_1$, $addr_2$, two corresponding expected val
 
 In Section~\ref{sec:data_org}, we present the data structures used by Quancurrent. Section~\ref{sec:update_alg} presents the update operation, and \todo[color=red]{fix} Section~\ref{sec:query_alg} presents the query. The formal correctness proof is deferred to the supplementary material. 
 
-
+%============================================================
 \section{Data Structures} \label{sec:data_org}
-
+%============================================================
 \mysketch's data structures are described in Algorithm~\ref{alg:data_organization} and depicted in Figure~\ref{fig: data_structures}.
 Similarly to the sequential Quantiles sketch, \mysketch is organized as a hierarchy of arrays called \emph{levels}. Each level can be \emph{empty}, \emph{full}, or in \emph{propagation}. The variable \emph{tritmap} maintains the states of all levels. Tritmap is an unsigned integer, interpreted as an array of trits (trinary digits). The trit $tritmap[i]$ describes level $i$'s state: if $tritmap[i]$ is $0$, level $i$ contains $0$ or $2k$ ignored elements and is considered to be empty. If $tritmap[i]$ is $1$, level $i$ contains $k$ elements and is deemed full, and if it is $2$, level $i$ contains $2k$ elements and is associated with the propagation state. Each thread has a local buffer of size $b$, $\mathit{localBuf[b]}$. Before ingested into the sketch's levels, stream elements are buffered in threads local buffers and then moved to a processing unit called $\mathit{Gather\&Sort}$. The $\mathit{Gather\&Sort}$ object has two $2k$-sized shared buffers, $\mathit{G\&SBuffer}[2]$, each with its own $\mathit{index}$ specifying the current location, as depicted in Figure~\ref{fig: gather_and_sort}. 
 
@@ -153,37 +153,123 @@ If $\mathit{tritmap}[l+1]$ is $0$, then level $l+1$ is empty. We use DCAS (Line~
 Propagations of different batches may occur concurrently, i.e., level propagation of levels $l$ and $l'$ can be performed in parallel. Figure~\ref{fig: propagate} depicts an example of concurrent propagation of two batches.
 
 
-% \begin{algorithm}[h]
-% \caption{Stage 3: Propagation of level $l$} \label{alg: propagate}
-% \SetKwFunction{propagate}{propagate}
-% \Procedure{\propagate{\myvar{l}}}{
-%     %\Comment*[l]{\myvar{tritmap}[\myvar{l}] was set to 2 by this thread and wasn't changed}
-%     \lIf(){\myvar{l} $\geq$ \myvar{MAX\_LEVEL}}{\KwRet{}}
-%     \Comment*[l]{choose odd or even indexed elements randomly}
-%     \myvar{newLevel} $\gets$ sampleOddOrEven(\myvar{levels}[\myvar{l}]) \; \label{Line: choose_rand}
-%     \uIf(\Comment*[f]{next level is full}){\myvar{tritmap}[\myvar{l}$+1$] $ =1$}{
-%          \myvar{newLevel} $\gets$ merge(\myvar{newLevel}, \myvar{levels}[\myvar{l}$+1$]) \label{Line: next_full}\;
-%          \lWhile(\label{Line:next_full_DCAS}){$\neg$DCAS(\myvar{levels}[\myvar{l}$+1$]: \myvar{levels}[\myvar{l}$+1$] $\to$ \myvar{newLevel},  \myvar{tritmap}[\myvar{l}, \myvar{l}$+1$]: $ [2,1] \to [0,2]$)}{\{ \}} 
-%         \myvar{levels}[\myvar{l}] $\gets \bot$ \Comment*[r]{clear level} 
-%         \KwRet{propagate(\myvar{l}+1)} \label{Line:propagate_next}
-%     }
-%     \Comment*[l]{\myvar{tritmap}[\myvar{l}+1] is 0 or 2}
-%     \lWhile(\label{Line:next_empty_DCAS}){$\neg$DCAS(\myvar{levels}[\myvar{l}$+1$]: $ \bot \to$ \myvar{newLevel}, \myvar{tritmap}[\myvar{l}, \myvar{l}$+1$]: $ [2,0] \to [0,1]$)}{\{ \}} 
-%         \myvar{levels}[\myvar{l}] $\gets \bot$ \Comment*[r]{clear level} 
-% }
-% \end{algorithm}
+\begin{algorithm}[h]
+\caption{Stage 3: Propagation of level $l$} \label{alg: propagate}
+\begin{algorithmic}[1]
+\setcounter{ALG@line}{\value{mycounter}}
+\Procedure{propagate}{\myvar{l}}
+    \If{ \myvar{l} $\geq$ \myvar{MAX\_LEVEL} }
+        \State \Return
+    \EndIf
+    \State \myvar{newLevel} $\gets$ sampleOddOrEven(\myvar{levels}[\myvar{l}]) \Comment{choose odd or even indexed elements randomly} \label{Line: choose_rand}
+    \If{\myvar{tritmap}[\myvar{l}$+1$] $ =1$} \Comment{next level is full}
+        \State \myvar{newLevel} $\gets$ merge(\myvar{newLevel}, \myvar{levels}[\myvar{l}$+1$]) \label{Line: next_full}
+        \While{$\neg$DCAS(\myvar{levels}[\myvar{l}$+1$]: \myvar{levels}[\myvar{l}$+1$] $\to$ \myvar{newLevel},  \myvar{tritmap}[\myvar{l}, \myvar{l}$+1$]: $ [2,1] \to [0,2]$)} \{\} \label{Line:next_full_DCAS}
+        \EndWhile
+        \State \myvar{levels}[\myvar{l}] $\gets \bot$ \Comment{clear level} 
+        \State \Return{propagate(\myvar{l}+1)} \label{Line:propagate_next}
+    \EndIf
+    \While{$\neg$DCAS(\myvar{levels}[\myvar{l}$+1$]: $ \bot \to$ \myvar{newLevel}, \myvar{tritmap}[\myvar{l}, \myvar{l}$+1$]: $ [2,0] \to [0,1]$)} \{\} \label{Line:next_empty_DCAS}
+    \EndWhile
+    \State \myvar{levels}[\myvar{l}] $\gets \bot$ \Comment{clear level}
+\EndProcedure
+\setcounter{mycounter}{\value{ALG@line}}
+\end{algorithmic}
+\end{algorithm}
+
 
 \begin{figure*}[h]
-\includegraphics[width=0.8\textwidth,trim={0 0cm 0 0},clip]{images/Quancurrent/propagate short.pdf}
+\includegraphics[width=\textwidth,trim={0 0cm 0 0},clip]{graphics/algorithm/propagate_short.pdf}
 \centering
 \captionsetup{justification=centering}
-\caption[\mysketch~\xspace propagation.]{\mysketch~\xspace propagation. \par \small \textbf{(a)} The owner of batch $i$, owner($i$), inserts batch $i$ to level $0$ and atomically updates $tritmap[0]$ to $2$. 
-\textbf{(b)} owner($i$) merges level $0$ with level $1$ and changes $tritmap[1,0]$ from $[1,2]$ to $[2,0]$. 
-\textbf{(c)} owner($i$) clears level $0$. 
-\textbf{(d)} owner($i+1$) inserts its batch to level $0$ and atomically updates $tritmap[0]$ to $2$. 
-\textbf{(e)} owner($i$) merges level $1$ with level $2$, and sets $tritmap[2,1]$ to $[2,0]$. Batch $i+1$ is still blocked because level $1$ has not been cleared yet. 
-\textbf{(f)} owner($i$) clears level $1$. 
+\caption[\mysketch~\xspace propagation.]{\mysketch~\xspace propagation. \par \small \textbf{(a)} The owner of batch $i$, owner($i$), inserts batch $i$ to level $0$ and atomically updates $tritmap[0]$ to $2$. \\
+\textbf{(b)} owner($i$) merges level $0$ with level $1$ and changes $tritmap[1,0]$ from $[1,2]$ to $[2,0]$. \\
+\textbf{(c)} owner($i$) clears level $0$. \\
+\textbf{(d)} owner($i+1$) inserts its batch to level $0$ and atomically updates $tritmap[0]$ to $2$. \\
+\textbf{(e)} owner($i$) merges level $1$ with level $2$, and sets $tritmap[2,1]$ to $[2,0]$. Batch $i+1$ is still blocked because level $1$ has not been cleared yet. \\
+\textbf{(f)} owner($i$) clears level $1$. \\
 \textbf{(g)} Now owner($i+1$) successfully merges level $0$ with the empty level $1$, and sets $tritmap[1,0]$ to $[1,0]$. 
 }
 \label{fig: propagate}
 \end{figure*}
+
+%============================================================
+\section{Query} \label{sec:query_alg} %cached atomic snapshot
+%============================================================
+
+% To simplify the query presentation we first present a one-time query and discuss its correctness. We then explain how our caching mechanism works. 
+
+Queries are performed by an unbounded number of query threads. A query returns an approximation based on a subset of the stream processed so far including all elements whose propagation into the levels array begun before the query was invoked. The query is served from an atomic snapshot of the levels array. The pseudo-code is presented in Algorithm~\ref{alg:sl_query}. Instead of collecting a new snapshot for each query, we cache the snapshot so that queries may be serviced from this cache, as long as the snapshot isn't too stale. The snapshot and the tritmap value that represents it are cached in local variables, $\mathit{snapshot}$ and $\mathit{myTrit}$, respectively. Query freshness is controlled by the parameter $\rho$, which bounds the ratio between the current stream size and the cached stream size. As long as this threshold is not exceeded, the cached snapshot may be returned (Lines~\ref{Line:check_rho}-\ref{Line:query_from_cache}). Otherwise, a new snapshot is taken and cached. 
+%Our implementation is strongly linearizable, with a formal proof is given in the \fcolorbox{red}{yellow}{Appendix}. Query results are approximate but within well defined error bounds that are user configurable by trading off sketch size, and the error analysis is presented in Section~\ref{sec:analysis}.
+
+
+The snapshot is obtained by first reading the tritmap, then reading the levels from $0$ to $MAX\_LEVEL$, and then reading the tritmap again. If both reads of the tritmap represent the same stream size then they represent the same stream. We can use the levels read to reconstruct some state that represents this stream. The process is repeated until two such tritmap values are read. For example, focusing on the last two phases of the propagation in Figure~\ref{fig: propagate}, lets assume a query thread $T_q$ reads $tm1=00202$, then reads the levels from $\mathit{levels[0]}$ to $\mathit{levels[4]}$ as depicted in Figure~\ref{fig: propagate} (between the dashed lines), and then read $tm2=00210$. The two tritmap reads represent the same stream of size $10k$, thus a snapshot representing the same stream can be constructed from the levels read. The pseudo-code for calculating the stream size is presented in Algorithm~\ref{alg:tritmap}. Each level is read atomically as the levels arrays are immutable and replaced by pointer swings. The snapshot is a subset of the levels summarizing the stream. To construct the snapshot, the collected levels are iterated over, in reversed order, from $\mathit{MAX\_LEVEL}$ to $0$, and level $i$ is added to the snapshot only if the total collected stream size (including level $i$) is less than or equal to the stream size represented by the tritmap (Line~\ref{Line:add_to_snapshot}). Back to our last example, the size of each level collected by $T_q$ is ${2k,k,2k,0,0}$ (in descending order). As explained, to construct the snapshot, we go over the collected levels from $\mathit{snapLevels[4]}$ to $\mathit{snapLevels[0]}$. By reading $snapLevels[1]$, the total stream size represented by snapshot is $0+0+4\cdot2k+2\cdot k = 10k$. As the stream size represented by $tm1$ and $tm2$ is $10k$, the construction of the snapshot is done and all elements of the processed stream are represented exactly once. The tritmap $\mathit{myTrit}$ maintains the total size of the collected stream and each trit describes the state of a collected level. If level i was collected to the snapshot, the value of $\mathit{myTrit[i]}$ is the size of level i divided by $k$ (Line~\ref{Line:update_myTrit}). 
+
+ 
+ 
+\begin{algorithm}[h]
+\caption{Tritmap} \label{alg:tritmap}
+\begin{algorithmic}
+\setcounter{ALG@line}{\value{mycounter}}
+\Procedure{streamSize}{}
+        \State \myvar{curr\_stream} $\gets$ 0
+        \For{\myvar{i} $\gets$ $0,\dots,\mathit{MAX\_LEVEL}$}
+            \State \myvar{weight} $\gets 2^i $
+            \If{\myvar{tritmap}[\myvar{i}] $=1$}
+                \State \myvar{curr\_stream} $\gets$ \myvar{curr\_stream} $+$ \myvar{weight}$\cdot k$
+            \ElsIf{\myvar{tritmap}[\myvar{i}] $=2$}
+                     \State \myvar{curr\_stream} $\gets$ \myvar{curr\_stream} $+$ \myvar{weight}$\cdot 2k$
+            \EndIf
+        \EndFor
+        \State \Return{\myvar{curr\_stream}}
+\EndProcedure
+\setcounter{mycounter}{\value{ALG@line}}
+\end{algorithmic}
+\end{algorithm}
+ 
+ 
+%As levels propagate from lowest to highest, by reading the levels in the same direction, elements may be read more than once, but no element can be missed. 
+As levels propagate from lowest to highest, reading the levels in the same direction ensures that no element would be missed but may cause elements to be represented more than once. Building the snapshot highest to lowest ensures that each element will be accounted once. 
+In other words, reading the levels from lowest to highest and building the snapshot highest to lowest ensures that an atomic snapshot is collected, as proven in the Supplementary material. 
+
+
+% Queries are performed by an unbounded number of query threads. Instead of collecting a new snapshot for each query, we cache the snapshot so that queries may be serviced from this cache, as long as the snapshot isn't too stale. Query freshness is controlled by the parameter $\rho$, which bounds the ratio between the current stream size and the cached stream size.
+% Let $n_{old}$ be the stream size of the cached snapshot, and let $n_{new}$ be the current stream size.
+% As long as this threshold is not exceeded ($n_{new} / n_{old} \leq \rho$), the cached snapshot may be returned (Lines~\ref{Line:check_rho}-\ref{Line:query_from_cache}). Otherwise, a new snapshot is taken and cached. 
+%after which the thread's cached snapshot is considered invalid and must be rebuilt (Lines~\ref{Line: read_current_stream}-\ref{Line: query_from_cache}).
+%Let $n_{old}$ be the stream size of the cached snapshot, and let $n_{new}$ be the current stream size. If $n_{new} / n_{old} \leq \rho$ then the query is answered from the cached snapshot. Otherwise, or if no snapshot is cached, a strongly linearizable snapshot is taken. Once a new snapshot has been built, it is cached.
+
+
+\begin{algorithm}[h]
+\caption{Query} \label{alg:sl_query}
+\begin{algorithmic}
+\setcounter{ALG@line}{\value{mycounter}}
+\Procedure{Query}{$\phi$}
+    \State \myvar{tm1} $\gets$ tritmap \label{Line:read_current_stream}
+    \If{$\frac{tm1.streamSize()}{myTrit.streamSize()}$ $\leq$  $\rho$} \label{Line:check_rho}
+        \State \Return{snapshot.query($\phi$)} \label{Line:query_from_cache}
+    \EndIf
+    \Repeat \label{Line:start_collect_levels}
+        \State \myvar{tm1} $\gets$ tritmap
+        \State \myvar{snapLevels} $\gets$ read \myvar{levels} $0$ to \myvar{MAX\_LEVEL} \label{Line: read_snap}
+        \State \myvar{tm2} $\gets$ \myvar{tritmap} \label{Line: second-collect}
+    \Until{\myvar{tm1}.streamSize() = \myvar{tm2}.streamSize() }  \label{Line:query_linearization}
+    \State \myvar{myTrit} $\gets 0$ \label{line: query_estimate_start}
+    \State \myvar{snapshot} $\gets$ empty \myvar{snapshot}
+    \For{\myvar{i} $\gets$ $\mathit{MAX\_LEVEL},\dots,0$} \label{Line:start_collect_snapshot}
+        \State \myvar{weight} $\gets 2^i $
+        \If{\myvar{snapLevels}[\myvar{i}].size()$\cdot$\myvar{weight}+ \myvar{myTrit}.streamSize()$\leq$\myvar{tm1}.streamSize()} \label{Line:add_to_snapshot}
+            \State add \myvar{snapLevels}$[i]$ to \myvar{snapshot} \label{Line:add_level_to_snapshot}
+            \State \myvar{myTrit}[\myvar{i}] $\gets$ \myvar{snapLevels}[\myvar{i}].size()$ / k$  \label{Line:update_myTrit} \label{line: query_estimate_end}
+            \If{\myvar{myTrit}.streamSize()=\myvar{tm1}.streamSize()} \label{Line:snapshot_done}
+                \State \textbf{break}
+            \EndIf
+        \EndIf
+    \EndFor
+    \State \Return{\myvar{snapshot}.query($\phi$)} \label{Line:query_result}
+\EndProcedure
+\setcounter{mycounter}{\value{ALG@line}}
+\end{algorithmic}
+\end{algorithm}
+
+
