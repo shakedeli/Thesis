@@ -1,0 +1,211 @@
+\chapter{Correctness}
+\label{chap:correctness}
+
+
+In this section we prove \mysketch's correctness. 
+
+\section{Preliminaries}
+
+Queries are answered from an array of ordered tuples summarizing the total stream processed so far and denoted as $\mathit{samples}$. Each tuple contains a summary point (i.e.,a value from the sketch) and its associated weight. The samples array contains all the sketch's summary points and is sorted according to their values. Note that, only levels with $\mathit{tritmap}[i]\in{1,2}$ are included.
+
+As described in Section~\ref{Section: concurrent_algorithm}, the update operation is divided into 3 stages: 
+(1) $\mathit{gather\ and\ sort}$ is the process of ingesting stream elements into a $\mathit{Gather\&Sort}$ unit.
+(2) $\mathit{batch\ update}$ is the process of copying $2k$ elements from one of the \emph{G\&SBuffer}s into \mysketch's first level. 
+(3) $\mathit{propagate\ levels}$ is the process of merging base level up the sketch's levels until reaching an empty level. 
+
+% In the following section we list some definitions and prove the correctness of \mysketch. 
+
+
+Correctness of an object's implementation is defined with respect to a sequential specification $\mathcal{H}$. Sequential specification is defined with respect to deterministic objects. Therefore, we de-randomized the Quantiles sketch by providing coin flips with every update. We call the set of sequential histories of the deterministic Quantiles sketch as \emph{SeqSketch}.
+
+\subsection{Definitions}
+
+Rinberg et al.~\cite{Rinberg_2020_fast_sketches} defined the relation between a sequential history and a stream:
+\begin{definition} 
+Given a finite sequential history H, $\mathcal{S}(H)$ is the stream $a_1,\dots,a_n$ such that $a_k$ is the argument of the $k^{th}$ update in H.
+\end{definition}
+
+
+The notion of \emph{happens before} in a sequential history as defined in \cite{Rinberg_2020_fast_sketches}:
+\begin{definition}
+Given a finite sequential history $\mathit{H}$ and two method invocation $M_1,M_2$ in $\mathit{H}$, if $M_1$ precedes $M_2$ in $\mathit{H}$, we denote $M_1 \prec_H M_2$.
+\end{definition}
+
+\begin{definition}[Unprop updates] \label{Def: unprop_update}
+Given a finite execution \s of \mysketch, we denote by suffix(\s) as the suffix of \s starting at the last successful $\mathit{batch update}$ event, or the beginning of \s if no such event exists.
+We denote by $\mathit{up\_suffix}(\sigma)$ the sub-sequence of $\mathit{H(suffix}(\sigma))$ consisting of updates operations in the $Gather\&Sort$ units.
+We denote by $\mathit{up\_suffix_i}(\sigma)$ the sub-sequence of $\mathit{H(suffix}(\sigma))$ consisting of updates operations in the local buffer of thread $T_i$.
+\end{definition}
+
+\begin{definition}[Updates Number] \label{Def: updates_num}
+We denote the number of updates in history $\mathit{H}$ as $\mathit{|H|}$.
+\end{definition}
+
+
+\section{Algorithm Correctness Proof}
+
+% \subsection{Algorithm Proof}
+
+\begin{lemma} \label{Lem: sl_relaxation}
+\mysketch is strongly linearizable with respect to the relaxed specification $SeqSketch^r$ with \(r=4kS + (N-S)b\), where $S$ is the number of NUMA nodes, $k$ is the sketch summary size, $b$ is the size of threads local buffer and $N$ is the number of update threads.
+\end{lemma}
+\begin{proof}
+\mysketch is an $r$-relaxed concurrent Quantiles sketch. The correctness condition for randomized algorithms under concurrency is strong linearizability~\cite{strong_linearizability}. Strong linearizability is defined with respect to the sequential specification of a data structure. We denote by $\mathit{SeqSpec}$ the sequential specification of \mysketch.
+
+
+A relaxed consistency extend the sequential specification of an object to a larger set that contains sequential histories which are not legal but are at bounded "distance" from a legal sequential history~\cite{Henzinger_2013_Quantitative_Relaxation,Afek_2010_Quasi_linearizability,Rinberg_2020_fast_sketches}. We convert \mysketch into a deterministic object by providing a coin flip with every update. We re-define (de-randomized) \mysketch sequential specification by relaxing it. Intuitively, we allow a query to "miss" a bounded number of updates that precede it. Quantiles sketch is order agnostic, thus re-ordering updates is also allowed. 
+
+Let $\sigma$ be a concurrent execution of \mysketch. We use two mappings from concurrent executions to sequential histories defined as follows.
+We define a mapping, $l$, from a concurrent execution to a serialization, by ordering operations according to the following linearization points:
+\begin{itemize}
+\item \textbf{Query} linearization point is the second \emph{tritmap} read, $tm2$, such that it summarizes the same stream size as $tm1$ (Algorithm~\ref{alg: sl_query}, Line~\ref{Line:query_linearization}).
+\item \textbf{Update} linearization point is the insertion to threads local buffers (Algorithm \ref{alg: gather}, Line \ref{Line: update_linearization}).
+\end{itemize}
+
+Strong linearizability requires that the linearization of a prefix of a concurrent execution is a prefix of the linearization of the whole execution. By definition, $l(\sigma)$ is prefix-preserving. Note that $l(\sigma)$ is a serialization that does not necessarily meets the sequential specification.
+
+Relaxed consistency extends the sequential specification of an object to include also relaxed histories.
+We define a mapping, $f$, from a concurrent execution to a serialization, by ordering operations according to visibility points:
+\begin{itemize}
+\item \textbf{Query} visibility point is its query's linearization point.
+\item \textbf{Update} visibility point is the time after its invocation in $\sigma$ such that the \emph{G\&SBuffer} (this update is inserted into) is batched updated into level 0 with DCAS. If there is not such time, then this update does not have a visibility point, meaning, it is not included in the relaxed history, $f(\sigma)$.
+\end{itemize}
+
+To prove correctness we need to show that for every execution $\sigma$ of \mysketch: (1) $f(\sigma) \in \mathit{SeqSpec}$, and (2) $f(\sigma)$ is an $r$-relaxation of $l(\sigma)$ for $r=4kS + (N-S)b$.
+
+We show the first part. 
+\begin{lemma} \label{Lem: visibility_in_seq_spec}
+Given a finite execution $\sigma$ of \mysketch, $f(\sigma)$ is in the sequential specification. 
+\end{lemma}
+
+\begin{proof}
+First, we present and prove some invariants. 
+
+\begin{invariant}\label{Inv: GSBuffer_summary}
+The Gather\&Sort object summarises at most 4k elements.
+\end{invariant}
+\begin{proof}
+The Gather\&Sort unit contains two buffers of \(2k\) elements. Elements are ingested into the buffer without a sampling process. The desired summary is agnostic to the processing order, therefore \(\mathnormal{S}\) summarises history of \(4k\) update operations and their responses. 
+\end{proof}
+
+\begin{lemma}
+The variable tritmap is a monotonic increasing integer.
+\end{lemma}
+\begin{proof}
+The variable tritmap is altered only in Line~\ref{Line:insert_batch} of Algorithm~\ref{alg: batch_update}, in Line~\ref{Line:next_full_DCAS} of Algorithm~\ref{alg: propagate} and in Line~\ref{Line:next_empty_DCAS} of Algorithm~\ref{alg: propagate}. By definition, it is only incremented.
+\end{proof}
+
+
+% \begin{invariant}\label{Inv: baseLevel}
+% The first digit of tritmap (i.e \(tritmap[0] = 0\)) satisfies:
+% \begin{itemize}
+%     \item If \(tritmap[0] = 0\), then \(levels[0]\) is empty or is not contained in the sketch's samples array.
+%     \item[] or
+%     \item If \(tritmap[0] = 2\), then \(levels[0]\) contains \(2k\) points.
+% \end{itemize}
+% \end{invariant}
+% \begin{proof}
+% By definition, \emph{tritmap} is initialized to 0 and updated only at \emph{insertBase} and \emph{mergeLevel} procedures. On each propagation, we copy current G\&SBuffer array to level 0 by calling \emph{insertBase}, increase \emph{tritmap} by 2 and start propagateLevels. At the beginning of each propagation, we first merge the base level of \(\mathnormal{S}\) into the next level and increase \emph{tritmap} by 1. After each \emph{insertBase}, \(tritmap[0] = 2\) and \(levels[0]\) contains \(2k\) points. After each merge of base level, \(tritmap[0] = 0\) and \(levels[0]\) is not contained in the sketch's samples array. On each \emph{propagation}, the following \emph{mergeLevel} calls (after the merge of base level) increase \emph{tritmap} by $3^i$ for $i>0$ and therefore \(tritmap[0] = 0\) until the end of \emph{propagation}. 
+% \end{proof}
+
+
+\begin{invariant} \label{Inv: tritmap_sketch_state}
+The variable tritmap represents the sketch state:
+\begin{itemize}
+    \item If \(tritmap[i] = 0\), then \(levels[i]\) is empty or does not contained in the sketch's samples array.
+    \item If \(tritmap[i] = 1\), then \(levels[i]\) contains \(k\) points associated with a weight of \(2^i\).
+    \item If \(tritmap[i] = 2\), then \(levels[i]\) contains \(2k\) points associated with a weight of \(2^i\).
+\end{itemize}
+\end{invariant}
+\begin{proof}
+The proof is by induction on the length of levels array (or the current maximum depth of levels[]).\\
+\underline{Base}: By definition, tritmap is initialized to 0 and updated only at the batchUpdate procedure and the propagate procedure.
+After the first batch update, level 0 contains $2k$ elements and tritmap is increased by 2 such that tritmap[0]=2. When this first batch is merged with the next level, level 1 contains $k$ elements and tritmap is increased by 1 such that tritmap[0]=0.
+On each propagation, we first perform a batch update of one of the G\&SBuffer arrays to level 0 and increase tritmap by 2. Then we call propagate() starting with level 0. Level 0 is merged with the next level and tritmap is incremented by 1. Therefore, after each batchUpdate, \(tritmap[0] = 2\) and level 0 contains \(2k\) elements and after each call to propagate(0) \(tritmap[0] = 0\) and level 0] is not contained in the sketch's samples array. The following calls to propagate increase tritmap by $3^i$ for $i>0$ and \(tritmap[0] = 0\) until the end of the current propagation. \\
+\underline{Inductive hypothesis}: We assume the invariant holds for all levels i such that \(i>0\) and prove it holds for level \(i+1\). By definition, tritmap is updated only at batchUpdate and propagate procedures. For \(i>0\), \(tritmap\) is changed only if \(tritmap[i]=2\). By the inductive hypothesis, if \(tritmap[i] = 2\), then \(levels[i]\) contains \(2k\) points associated with a weight of \(2^i\). If propagation has not yet reached level i+1, it is empty and \(tritmap[i+1]=0\) from initialization. After a call to propagate(i), \(levels[i+1]\) contains k points associated with a weight of \(2^{i+1}\) and tritmap satisfies \([b_{31},\dots,b_{i+2},0,2,b_{i-1},\dots,b_0] + 3^i = [b_{31},\dots,b_{i+2},1,0,b_{i-1},\dots,b_0]\) i.e \(tritmap[i+1]=1\). Next time propagation will reach level i+1, it will contain \(2k\) points associated with a weight of \(2^{i+1}\) and tritmap will satisfy \([b_{31},\dots,b_{i+2},1,2,b_{i-1},\dots,b_0] + 3^i = [b_{31},\dots,b_{i+2},2,0,b_{i-1},\dots,b_0]\) i.e \(tritmap[i+1]=2\). Note that each propagation starts from level 0 and stops when reaching an empty level $j$, the tritmap trit larger then $j$ are not changed.
+\end{proof}
+
+
+\begin{invariant}\label{Inv: summary_history}
+Given a finite execution $\sigma$ of \mysketch, it summarises \(f(\sigma)\).
+\end{invariant}
+\begin{proof}
+The proof is by induction on the length of \(\sigma\).\\
+\underline{Base}: The base is immediate. \(\mathnormal{S}\) summarises the empty history.\\
+\underline{Inductive hypothesis}: We assume the invariant holds for \(\sigma'\), and prove it holds for \(\sigma = \{\sigma',step\}\). We consider only steps that can alter the invariant, meaning steps that can change the sketch state.
+\begin{itemize}
+    \item DCAS operation in batchUpdate, increasing tritmap by 2 and copying one of the G\&SBuffer arrays into the first level of \mysketch.
+    \item[] By the inductive hypothesis, before the step, \mysketch summarises \(f(\sigma')\). If the DCAS fails, the sketch state has not change. Else, $2k$ elements were copied to the level 0 and tritmap was increased by 2. 
+    From Invariant \ref{Inv: GSBuffer_summary}, a G\&SBuffer array summarises a collection of \(2k\) updated elements \(\{a_1,\dots,a_{2k}\}\). By copying, we sequentially ingest the stream \(B=\{a_1,\dots,a_{2k}\}\) to \mysketch. Let \(A=\mathcal{S}(f(\sigma'))\). By definition, \mysketch summarises \(A||B\). Therefore \mysketch summarises \(f(\sigma)\), preserving the invariant. 
+    \item DCAS operations in propagate, updating tritmap and merging level \(i\) with its following level.
+    \item[] By the inductive hypothesis, before the step, \mysketch summarises \(f(\sigma')\). If the DCAS fails, the sketch state has not changed by the step. Else, we propagated level \(i\) into level \(i+1\). By definition, \(k\) points from level \(i\) were merged with level \(i+1\), with the weight of each point scaled up by a factor 2. tritmap[i]=0 and therefore level \(i\) was disabled from \(samples[]\) such that \(2k\) points associated with \(2^i\) weight are not included in the summary. The total weight of the summary points was not changed. The sketch's state summarises the same stream, no new points were added and the stream size was not changed. \mysketch summarises \(f(\sigma)\), preserving the invariant. 
+    \item Operations to clear level i, updating \(levels[i] \gets \bot\).
+    \item[] By definition, \(tritmap[i] = 0\). By Invariant \ref{Inv: tritmap_sketch_state}, \(levels[i]\) is empty or not included in \(samples[]\), meaning clearLevel does not affect the summary points.  \(\mathnormal{S}\) summarises \(f(\sigma)\), preserving the invariant. 
+\end{itemize}
+\end{proof}
+
+\begin{lemma}[Query Correctness] \label{Lem: query_correctness}
+Given a finite execution \s of \mysketch, let Q be a query that returns in \s. Let \v be the visibility point of \Q, and let $\sigma'$ be the prefix of \s until point \v. Q returns a value equal to the value returned 
+by a sequential sketch after processing $\mathcal{S}\left(f(\sigma')\right)$.
+
+\end{lemma}
+\begin{proof}
+Let \s be an execution of \mysketch, let \Q be a query that returns in \s, and let \v be the visibility point of \Q. Let \s' be the prefix of \s until point \v, and let \(A=\mathcal{S}(f(\sigma'))\).
+By definition, the visibility point of a query is when the second tritmap read returns a value representing the same stream size as the previous tritmap read. As proved in Lemma~\ref{Lem: query_estimate}, the collected state represents the same stream as \mysketch at the visibility point. By Invariant \ref{Inv: summary_history}, at point \v, \mysketch summarises \fstag, and, similarly, summarises the stream \A. 
+Therefore, \(query(arg)\) returns a value equal to the value returned by a sequential sketch after processing \(A=\mathcal{S}(f(\sigma'))\).
+\end{proof}
+
+We have shown that each query in \fs estimates all updates that happened before its invocation. Specifically, a query invocation at the end of a finite execution \s,
+returns a value equal to the value returned by a sequential sketch after processing
+\A. By this, we have proven that $ f(\sigma) \in SeqSpec$.
+\end{proof}
+
+We now show that for every execution \s, \fs  is an \(r\)-relaxation of \(l(\sigma)\) for \(r = 4kS + (N-S)b\).
+The order between operations satisfies:
+
+\begin{lemma}\label{Lem: op_order}
+Given a finite execution \s of \mysketch, and given an operation O (query or update) in l(\s), for every query Q in l(\s) such that Q happened before O in \(l(\sigma)\), then Q happened before O in \(f(\sigma)\):  \[Q \prec_{l(\sigma)} O \Rightarrow  Q \prec_{f(\sigma)} O\]
+\end{lemma}
+\begin{proof}
+If O is a query then the proof is immediate since the visibility point and the linearization point of query are equal. Else, O is an update. By definitions, the linearization point of update happens before its visibility point. As the linearization point and visibility point of query \Q are equal, it follows that if \(Q \prec_{l(\sigma)} O\) then \(Q \prec_{f(\sigma)} O\).
+\end{proof}
+
+Note that as query linearisation point is equal to its visibility point, all queries in \fs will also be in \ls. 
+
+\begin{lemma}\label{Lem: GSBuffer_updates_num}
+Given a finite execution \s of \mysketch, the maximum number of unpropagated updates operations in Gather\&Sort units is \(S \cdot 4k\): \[|up\_suffix(\sigma)| \leq S \cdot 4k\], where S is the number of NUMA nodes
+\end{lemma}
+\begin{proof}
+If update operation is included in \(up\_suffix(\sigma)\), the size of the array in G\&SBuffer that the update is a member of, is less-equal $2k$. By definition, if both arrays in a Gather\&Sort unit are full, no update thread (pinned to the same node as the Gather\&Sort unit) can copy his local buffer's elements. It follows that \(|up\_suffix(\sigma)| \leq S\cdot4k\).
+\end{proof}
+
+We give an upper bound on the number of updates in a threads local buffers.
+
+\begin{lemma}\label{Lem: local_updates_num}
+Given a finite execution \s of \mysketch, the number of unpropagated updates in the local buffer of thread \(T_i\) is bounded by b, \[|up\_suffix_i(\sigma)| \leq b\]
+\end{lemma}
+\begin{proof}
+If update is included in \(up\_suffix_i(\sigma)\) , it follows that \(|items_buf_i| \leq b\) and therefore \(|up\_suffix_i(\sigma)| \leq |items_buf_i| \leq b \). When the local buffer of thread \(T_i\) is full, it copies \(items_buf_i\) to one of the G\&SBuffer's arrays and the corresponding updates will not be included in \(up\_suffix_i(\sigma)\).
+\end{proof}
+
+To prove that \fs is an \((4kS + (N-S)b)\)-relaxation of \ls, first, we will show that \fs comprised of all but at most \(r=4kS + (N-S)b\) invocations in \ls and their responses.
+
+\begin{lemma} \label{Lem: invocations_bound}
+Given a finite execution \s of \mysketch, \[ |f(\sigma)| \ge |l(\sigma)| - (4kS + (N-S)b) \]
+\end{lemma}
+\begin{proof}
+\ls contains all updates, \fs contains all updates with visibility points. Updates without visibility points are the unpropagated updates in G\&SBuffers and unpropagated updates in the local buffer of each update thread. There are \(N\) update threads, therefore, excluding S update thread that may continue, \(|f(\sigma)| = |l(\sigma)| - (\sum_{i=1}^{N-S}|up\_suffix_i(\sigma)|) - |up\_suffix(\sigma)|\). From Lemma \ref{Lem: local_updates_num}, \(|up\_suffix_i(\sigma)| \leq b\) and from Lemma \ref{Lem: GSBuffer_updates_num}, \(|up\_suffix(\sigma)| \leq S \cdot 4k\). Therefore, \(|f(\sigma)| \ge |l(\sigma)| - (4kS + (N-S)b)\).
+\end{proof}
+
+To complete the poof that \fs is an \((4kS + (N-S)b)\)-relaxation of \ls, we will show that each invocation in \fs is preceded by all but at most \((4kS + (N-S)b)\) of the invocations that precede the same invocation in \ls.
+
+\begin{lemma}\label{Lem: relaxation}
+Given a finite execution \s of \mysketch, \fs is an \((4kS + (N-S)b)\)-relaxation of \ls.
+\end{lemma}
+\begin{proof}
+Let O be an operation in \fs such that O is also in \ls. Let \(Ops\) be a collection of operations preceded O in \ls but not preceded O in \fs, i.e \( Ops=\{O'| O' \prec_{l(\sigma)} O \wedge  O' \nprec_{f(\sigma)} O \} \). By Lemma \ref{Lem: op_order}, query \( Q \notin Ops \). Let \(\sigma^{pre}\) be the prefix of \s and let \(\sigma^{post}\) be the suffix of \s such that \( l(\sigma)=\sigma^{pre},O,\sigma^{post} \). From Lemma \ref{Lem: local_updates_num}, \(|f(\sigma^{pre})| \ge |l(\sigma^{post})| - (4kS + (N-S)b))\). As \(|f(\sigma^{pre})|\) is the number of updates preceded O in \(f(\sigma^{pre})\), and \(|l(\sigma^{pre})|\) is the number of updates preceded O \(l\sigma^{pre})\), it follows that \(|Ops| = |l(\sigma^{pre})|-|f(\sigma^{pre})| \leq |l(\sigma^{pre})|-(|l(\sigma^{post})| - (4kS + (N-S)b))\leq (4kS + (N-S)b)\). Therefore, by Definition \ref{Def: relaxation}, \fs is an \((4k+b(N-1))\)-relaxation of \ls.
+\end{proof}
+
+Finally, we have proven that given a finite execution \s of \emph{Quancurrent}, \ls is strongly linearizable, \(f(\sigma) \in SeqSpec\) and \fs is an \((4kS + (N-S)b)\)-relaxation of \ls. We have proven Lemma \ref{Lem: sl_relaxation}.
+
+\end{proof}

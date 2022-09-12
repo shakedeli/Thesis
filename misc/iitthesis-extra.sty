@@ -417,11 +417,14 @@
  \newtheorem{theorem}{Theorem}[chapter]
  \renewtheorem*{theorem*}{Theorem}
  \newtheorem{lemma}{Lemma}[section]
- \newaliasedtheorem{corollary}[theorem]{Corollary}
- \renewtheorem*{corollary*}{Corollary}
- \newaliasedtheorem{proposition}[lemma]{Proposition}
- \renewtheorem*{proposition*}{Proposition}
- \newaliasedtheorem{claim}[lemma]{Claim}
+ \newtheorem{claim}[theorem]{Claim}
+\newtheorem{corollary}{Corollary}
+\newtheorem{invariant}{Invariant}
+%  \newaliasedtheorem{corollary}[theorem]{Corollary}
+%  \renewtheorem*{corollary*}{Corollary}
+%  \newaliasedtheorem{proposition}[lemma]{Proposition}
+%  \renewtheorem*{proposition*}{Proposition}
+%  \newaliasedtheorem{claim}[lemma]{Claim}
 
  %style:
  \theorembodyfont{\normalfont}
@@ -469,7 +472,7 @@
  \newcounter{endproofctr}%
  \gdef\proofSymbol{\ensuremath{\blacksquare}}
  \newcommand{\proofname}{Proof}
- \newenvironment{proof}[1][\proofname]{
+ \newenvironment{proof}[1][\proofname.]{
    \th@nonumberplain
    \def\theorem@headerfont{\itshape}%
    \normalfont

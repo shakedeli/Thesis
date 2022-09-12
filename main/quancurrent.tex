@@ -206,7 +206,6 @@ Queries are performed by an unbounded number of query threads. A query returns a
 The snapshot is obtained by first reading the tritmap, then reading the levels from $0$ to $MAX\_LEVEL$, and then reading the tritmap again. If both reads of the tritmap represent the same stream size then they represent the same stream. We can use the levels read to reconstruct some state that represents this stream. The process is repeated until two such tritmap values are read. For example, focusing on the last two phases of the propagation in Figure~\ref{fig: propagate}, lets assume a query thread $T_q$ reads $tm1=00202$, then reads the levels from $\mathit{levels[0]}$ to $\mathit{levels[4]}$ as depicted in Figure~\ref{fig: propagate} (between the dashed lines), and then read $tm2=00210$. The two tritmap reads represent the same stream of size $10k$, thus a snapshot representing the same stream can be constructed from the levels read. The pseudo-code for calculating the stream size is presented in Algorithm~\ref{alg:tritmap}. Each level is read atomically as the levels arrays are immutable and replaced by pointer swings. The snapshot is a subset of the levels summarizing the stream. To construct the snapshot, the collected levels are iterated over, in reversed order, from $\mathit{MAX\_LEVEL}$ to $0$, and level $i$ is added to the snapshot only if the total collected stream size (including level $i$) is less than or equal to the stream size represented by the tritmap (Line~\ref{Line:add_to_snapshot}). Back to our last example, the size of each level collected by $T_q$ is ${2k,k,2k,0,0}$ (in descending order). As explained, to construct the snapshot, we go over the collected levels from $\mathit{snapLevels[4]}$ to $\mathit{snapLevels[0]}$. By reading $snapLevels[1]$, the total stream size represented by snapshot is $0+0+4\cdot2k+2\cdot k = 10k$. As the stream size represented by $tm1$ and $tm2$ is $10k$, the construction of the snapshot is done and all elements of the processed stream are represented exactly once. The tritmap $\mathit{myTrit}$ maintains the total size of the collected stream and each trit describes the state of a collected level. If level i was collected to the snapshot, the value of $\mathit{myTrit[i]}$ is the size of level i divided by $k$ (Line~\ref{Line:update_myTrit}). 
 
  
- 
 \begin{algorithm}[h]
 \caption{Tritmap} \label{alg:tritmap}
 \begin{algorithmic}
@@ -228,18 +227,6 @@ The snapshot is obtained by first reading the tritmap, then reading the levels f
 \end{algorithm}
  
  
-%As levels propagate from lowest to highest, by reading the levels in the same direction, elements may be read more than once, but no element can be missed. 
-As levels propagate from lowest to highest, reading the levels in the same direction ensures that no element would be missed but may cause elements to be represented more than once. Building the snapshot highest to lowest ensures that each element will be accounted once. 
-In other words, reading the levels from lowest to highest and building the snapshot highest to lowest ensures that an atomic snapshot is collected, as proven in the Supplementary material. 
-
-
-% Queries are performed by an unbounded number of query threads. Instead of collecting a new snapshot for each query, we cache the snapshot so that queries may be serviced from this cache, as long as the snapshot isn't too stale. Query freshness is controlled by the parameter $\rho$, which bounds the ratio between the current stream size and the cached stream size.
-% Let $n_{old}$ be the stream size of the cached snapshot, and let $n_{new}$ be the current stream size.
-% As long as this threshold is not exceeded ($n_{new} / n_{old} \leq \rho$), the cached snapshot may be returned (Lines~\ref{Line:check_rho}-\ref{Line:query_from_cache}). Otherwise, a new snapshot is taken and cached. 
-%after which the thread's cached snapshot is considered invalid and must be rebuilt (Lines~\ref{Line: read_current_stream}-\ref{Line: query_from_cache}).
-%Let $n_{old}$ be the stream size of the cached snapshot, and let $n_{new}$ be the current stream size. If $n_{new} / n_{old} \leq \rho$ then the query is answered from the cached snapshot. Otherwise, or if no snapshot is cached, a strongly linearizable snapshot is taken. Once a new snapshot has been built, it is cached.
-
-
 \begin{algorithm}[h]
 \caption{Query} \label{alg:sl_query}
 \begin{algorithmic}
@@ -272,4 +259,76 @@ In other words, reading the levels from lowest to highest and building the snaps
 \end{algorithmic}
 \end{algorithm}
 
+
+%As levels propagate from lowest to highest, by reading the levels in the same direction, elements may be read more than once, but no element can be missed. 
+As levels propagate from lowest to highest, reading the levels in the same direction ensures that no element would be missed but may cause elements to be represented more than once. Building the snapshot highest to lowest ensures that each element will be accounted once. 
+In other words, reading the levels from lowest to highest and building the snapshot highest to lowest ensures that an atomic snapshot is collected, as proven in the following section. 
+
+
+% Queries are performed by an unbounded number of query threads. Instead of collecting a new snapshot for each query, we cache the snapshot so that queries may be serviced from this cache, as long as the snapshot isn't too stale. Query freshness is controlled by the parameter $\rho$, which bounds the ratio between the current stream size and the cached stream size.
+% Let $n_{old}$ be the stream size of the cached snapshot, and let $n_{new}$ be the current stream size.
+% As long as this threshold is not exceeded ($n_{new} / n_{old} \leq \rho$), the cached snapshot may be returned (Lines~\ref{Line:check_rho}-\ref{Line:query_from_cache}). Otherwise, a new snapshot is taken and cached. 
+%after which the thread's cached snapshot is considered invalid and must be rebuilt (Lines~\ref{Line: read_current_stream}-\ref{Line: query_from_cache}).
+%Let $n_{old}$ be the stream size of the cached snapshot, and let $n_{new}$ be the current stream size. If $n_{new} / n_{old} \leq \rho$ then the query is answered from the cached snapshot. Otherwise, or if no snapshot is cached, a strongly linearizable snapshot is taken. Once a new snapshot has been built, it is cached.
+
+%============================================================
+\subsection{Query's Snapshot Correctness}
+%============================================================
+Let $\sigma$ be an execution of \mysketch and let $tm1$ and $tm2$ be responses of two read operations of $tritmap$, $op_1$ and $op_2$, respectively, in $\sigma$, such that $op_1$ precedes $op_2$. Let $\mathnormal{A}$ be the stream represented by $tm1$. We will prove that the constructed \emph{snapshot} in Algorithm~\ref{alg: sl_query}, Lines~\ref{line: query_estimate_start}-\ref{line: query_estimate_end}, summarizes the same stream $\mathnormal{A}$. We denote by $|\mathnormal{A}|$ to be the stream size and by $|snapshot|$ to be the size of the stream currently represented by $snapshot$.
+Let \emph{snapLevels} be the set all levels read between $op_1$ and $op_2$.
+
+First, we show that $tm1$ and $tm2$ represent the same stream, i.e.  $\mathnormal{A}$.
+
+\begin{lemma}
+Let $tm1$ and $tm2$ be responses of two read operations of $tritmap$.
+If $tm1$ and $tm2$ represent streams with equal size then $tm1$ and $tm2$ represent the same stream.
+\end{lemma}
+\begin{proof}
+By definition the variable tritmap is 3-based, 31 digits non-negative integer that is atomically updated by DCAS operation and is only increasing.   
+\end{proof}
+
+Second, we show that $snapLevels$ contains all sampled elements in the sketch, immediately after $tm2$, summarizing the stream $\mathnormal{A}$.
+
+\begin{lemma}\label{Lem: snap_no_miss}
+The set of levels, $snapLevels$, read between the two \emph{tritmap}'s reads, $op_1$ and $op_2$, contains all sampled elements summarizing the stream $\mathnormal{A}$.
+\end{lemma}
+\begin{proof}
+Let $x$ be an element in level $j$ immediately after $tm1$.
+If $x$ exists in level $j$ during the read of sketch's levels in Algorithm~\ref{alg: sl_query} Line~\ref{Line: read_snap}, then we are done.
+Otherwise, a propagation occurred in between the reads such that level $j$ was merged with the next level and cleared. During this merge, all level $j$'s elements, including $x$, were sampled and propagated to level $j+1$. If $x$ exists in level $j+1$ in the set $snapLevels$ then we are done, if not, we apply the above argument again. This continues up to MAX\_LEVEL and therefore snap contains the element $x$.
+\end{proof}
+
+The following refers to the construction of the subset \emph{snapshot} from level MAX\_LEVEL to 0:
+
+\begin{lemma} \label{Lem: all_dup}
+If level $j$ contains an element represented by the snapshot thus far, all elements in level $j$ are also (already) represented by this snapshot.
+\end{lemma}
+\begin{proof}
+During a call to the procedure \emph{propagate} with level $j$, the elements in that level are sampled and merged with level $j+1$, resulting in level $j+1$ representing also the elements of (former) level $j$.
+Let $x$ be an element represented by level $j$ in the set $snapLevels$.
+$x$ is also represented by level $i$ such that level $i$ is in the current \emph{snapshot} and $i>j$. Consider the process of propagation from level $j$ to level $i$, it follows from the above that level $i$ also represents all the elements in level $j$.
+\end{proof}
+
+Each element in level $j$ represents $2^i$ elements from the processed stream.
+
+\begin{lemma}\label{Lem: all_in_no_dup}
+If level $j$ represents new elements that are not represented by snapshot, the size of the sub-stream left to represent is at least the size of the representation of level $j$.
+
+If level $j$ represents elements already represented by snapshot, the sub-stream left to represent is smaller than the representation of level $j$.
+\end{lemma}
+\begin{proof}
+We will prove the first part by contradiction. Assume by contradiction that the size of sub-stream left to represent is smaller than the size of the representation of level $j$ such that $|snapshot\cup level[j]| > |\mathnormal{A}|$. It follows from Lemma~\ref{Lem: snap_no_miss} that level $j$ contains at least one duplicated element (an element already represented by level $i$ in \emph{snapshot} such that $i>j$). From Lemma~\ref{Lem: all_dup} all level $j$'s elements are duplicated and already being represented by the current \emph{snapshot}. Contradiction. 
+
+Now, for the second part, assume that an element $x$ is represented more than once by the current \emph{snapshot}. Let level $j$ be the second level to be added to \emph{snapshot} that also represents $x$ (first time to duplicate the representation of $x$). From Lemma~\ref{Lem: all_dup}, all elements in level $j$ are already represented by this snapshot.
+If level $j$ contains $2k$ elements, the size of sub-stream represented by level $j$ is $2k\cdot2^j$, and the size of the sub-stream left to represent is at most represented by levels 0 to $j-1$, meaning the size is at most $2k(1+2+\dots+2^{j-1})=2k(2^j-1)$ which is smaller than the size of sub-stream represented by level $j$.
+If level $j$ contains $k$ elements and is already represented by level $i$, $i>j$, in \emph{snapshot}, level $j-1$ must have propagated level $j$ deeper, i.e. level $j-1$ is also represented by level $i$, therefore, also already represented by \emph{snapshot}. Level $j$ represents $k\cdot2^j$. The size of the sub-stream left to represent is at most represented by levels 0 to $j-2$, meaning the size is at most $2k(1+2+\dots+2^{j-2})=k(2^{j-1}-2)$, which is smaller than the size of sub-stream represented by level $j$.
+\end{proof}
+
+
+\begin{lemma} \label{Lem: query_estimate}
+The snapshot constructed in Algorithm~\ref{alg: sl_query}, Lines~\ref{line: query_estimate_start}-\ref{line: query_estimate_end}, summarizes the same stream, $\mathnormal{A}$, as represented by the second tritmap read, $tm2$, in Algorithm~\ref{alg: sl_query}, Line~\ref{Line: second-collect}. 
+\end{lemma}
+\begin{proof}
+From Lemma~\ref{Lem: all_in_no_dup} $|snapshot|=|\mathnormal{A}|$ and every element is represented at most once in the constructed \emph{snapshot}.
+\end{proof}
 

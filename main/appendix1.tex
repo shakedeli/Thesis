@@ -1,21 +1,50 @@
-\chapter{Some sort of an appendix}
-\label{appendix:somesort}
+\chapter{Holes Analysis Proofs}
+\label{appendix:holes-pi-mono}
 
-You may want to include appendices of your own volition. Also, if you've developed any computer software, that needs to go in as an appendix as well.
+To show the bound on the expected number of holes, we present some claims. 
+In Section~\ref{sec:holes-analysis} we show in Equation~\ref{eq:pi-i-j} that 
+\begin{align*}
+\pi_{i,j} \leq \left(\frac{1}{2}\right)^{jb + 2i +1} {{jb+2i} \choose i}.
+\end{align*}
+Consider the following function:
+\begin{align*}
+f_1(i) \triangleq \left(\frac{1}{2}\right)^{jb + 2i +1} {{jb+2i} \choose i}.
+\end{align*}
 
-\section{A first section in this appendix}
+\begin{claim}\label{claim:holes-f-1}
+$f_1(i)$ is monotonically increasing for $i \in \{0,1,\dots,b-1\}$ and for $j,b \in \mathds{N}$. 
+\end{claim}
 
-Some appendix content here. And something nice to finish things off:
+\begin{proof}
+For $b=1$, $i \in {0}$ and the claim is immediate.\\
+For $b=2$, $i \in {0,1}$ thus,
+\begin{align*}
+    f_1(0) &= \left(\frac{1}{2}\right)^{2j+1} \\
+    f_1(1) &= \left(\frac{1}{2}\right)^{2j+3} {{2j+2} \choose 1} \\
+            &= \left(\frac{1}{2}\right)^{2j+1} \cdot \left(\frac{1}{2}\right)^{2} \cdot (2j+2)\\
+            &= f_1(0) \cdot \frac{2j+2}{4} \geq f_1(0) \cdot \frac{2+2}{4} = f_1(0).
+\end{align*}
+For $b>2$, we show that $f_1(i+1)\geq f_1(i)$ for all $i \in \{0,1,\dots,b-2\}$ and for $j,b \in \mathds{N}$
 
-\begin{figure}[htb]
-  \centering
-  \ifpdf
-    % \includegraphics[width=0.3\textwidth]{graphics/mygraphic2.png}
-  \else
-    % \includegraphics[width=0.3\textwidth]{graphics/mygraphic2-for-ps.eps}
-  \fi
-  \caption{A Flower.}
-\end{figure}
+\begin{align*}
+    f_1(i) &= \left(\frac{1}{2}\right)^{jb + 2i +1} {{jb+2i} \choose {i}} \\
+    f_1(i+1) &= \left(\frac{1}{2}\right)^{jb + 2i +3} {{jb+2i+2} \choose {i+1}} \\
+    &= \left(\frac{1}{2}\right)^{jb + 2i +3} \cdot \frac{(jb+2i+2)!}{(jb+i+1)!\cdot(i+1)!} \\
+    &= f_1(i) \cdot \frac{1}{4} \cdot \frac{(jb+2i+2)(jb+2i+1)}{(jb+i+1)(i+1)}
+\end{align*}
 
-\section{Another appendix section}
-After the (last) appendix-section comes the thesis' bibliography; Its style is set with the \verb|\thesisbibstyle| command. Then there are the Hebrew parts of thesis, which don't exactly ``follow" the bibliography in a logical sense, but rather start at the beginning of the thesis when considered as a right-to-left printed booklet. Thus, the last page of the extended Hebrew abstract of the thesis comes right ``after" the last page of the bibliography if you're turning the pages in left-to-right order.
+Consider the following function, 
+\begin{align}
+    
+\end{align}
+
+
+Consider the following function:
+\[g(x) = \frac{1}{4} \cdot \frac{(jb+2x+2)(jb+2x+1)}{(jb+x+1)(x+1)}.\]
+It is monotonically decreasing for $0 \leq x \leq b-1$. Consider $g(b-2)$:
+\[\frac{1}{4} \cdot \frac{(jb+2b-2)(jb+2b-3)}{(jb+b-1)(b-1)}.\]
+Denote this function as $h(j)$.
+\[h(1) = \frac{1}{4} \cdot \frac{(3b-2)(3b-3)}{(2b-1)(b-1)} \geq 9/8\]
+Furthermore, $h(j)$ is a monotonically increasing function, therefore $h(j) \geq 1$ for all $j \geq 1$.
+
+\end{proof}
