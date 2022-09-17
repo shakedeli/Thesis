@@ -10,9 +10,10 @@ Sketches are designed for \emph{stream} settings, in which each element is proce
 The classic literature on sketches has focused on inducing a small error while using a small memory footprint, in the context of sequential processing: the sketch is built by a single thread, and queries are served only after sketch construction is complete. Only recently, we begin to see works leveraging parallel architectures to achieve a higher ingestion throughput while also enabling queries concurrently with updates~\cite{Rinberg_2020_fast_sketches, stylianopoulos2020delegation}. 
 Of these, the only solution suitable for quantiles that we are aware of is the Fast Concurrent Data Sketches (FCDS) framework proposed by Rinberg et al.~\cite{Rinberg_2020_fast_sketches}. However, the scalability of FCDS-based Quantiles sketches is limited unless query freshness is heavily compromised (as we show below). Our goal is to provide a scalable concurrent Quantiles sketch that retains a small error bound with reasonable query freshness.
 
+In Chapter~\ref{chap:prelims} we formally define the system model. In Chapter~\ref{chap:background}, we define the problem and overview a popular sequential solution proposed by Agarwal et. al~\cite{mergeables_summaries} which is used by Apache DataSketches~\cite{DataSketches}, on which our concurrent sketch is based.
 
-In Section~\ref{sec:background}\todo[color=red]{fix}, we define the problem and overview a popular sequential solution proposed by Agarwal et. al~\cite{mergeables_summaries} which is used by Apache DataSketches~\cite{DataSketches}, on which our concurrent sketch is based.
-In Section~\ref{sec:Quancurrent}\todo[color=red]{fix}, we present \mysketch, our highly scalable concurrent Quantiles sketch.
+
+In Chapter~\ref{chap:quancurrent}, we present \mysketch, our highly scalable concurrent Quantiles sketch.
 Like FCDS, \mysketch relies on local buffering of stream elements, which are then propagated in bulk to a shared sketch.
 But \mysketch improves on FCDS by eliminating the latter's sequential propagation bottleneck, which mostly stems from the need to sort large buffers.
 
@@ -41,19 +42,21 @@ We show that using this architecture, high throughput can be achieved with much 
 % For scalability purposes, queries are served from a cached snapshot of the sketch. How up-to-date the query estimation is depends on the sizes of the local and shared buffers and on the freshness of the cached snapshot, both of which are controlled by parameters.
 
 To lower synchronization overhead, we allow buffered elements to be sporadically overwritten by others without being propagated, and others to be duplicated, i.e., propagated more than once. These occurrences, which we call \emph{holes}, alter the stream ingested by the data structure. 
-Yet, in Section~\ref{sec:analysis}\todo[color=red]{fix} we showed that for a sufficiently large local buffer, the expected number of holes is less than $1$ and, because they are random, they do not change the sampled distribution.
+Yet, in Chapter~\ref{chap:analysis} we showed that for a sufficiently large local buffer, the expected number of holes is less than $1$ and, because they are random, they do not change the sampled distribution.
 Figure~\ref{fig:intro-query-accuracy} presents quantiles estimated by \mysketch on a stream of normally distributed random values compared to an exact, brute-force computation of the quantiles, and shows that the estimation remains accurate.
 
 \begin{figure}[htp]
     \centering
     \includegraphics[width=\linewidth,trim={0cm 0.3cm 0cm 1.5cm},clip]
-    {graphics/graphs/accuracy/Oracle_Quancurrent_blocking_numa_cdf_normal_k1024_b16_keys10M_runs1_uT32_qT1_snapshot1_15-08-2022_07-15-13.pdf}
+    {graphics/graphs/accuracy/Oracle_Quancurrent_blocking_numa_cdf_normal_k1024_b16_keys10M_runs1_uT32_qT1_snapshot1_17-09-2022_07-00-49.pdf}
     \caption{\mysketch quantiles vs. exact CDF, k = 1024, normal distribution, 32 update threads, 10M elements.}
     \label{fig:intro-query-accuracy}
 \end{figure}
 
 
-In Section~\ref{sec:eval}\todo[color=red]{fix} we empirically evaluate \mysketch. We show an update speedup of $12$x and a query speedup of $30$x over the sequential sketch, both with linear speedup. We compare \mysketch to FCDS, which is the state-of-the-art in concurrent sketches, and show that for FCDS to achieve similar performance it requires an order of magnitude larger buffers that \mysketch, reducing query freshness tenfold.
+In Chapter~\ref{chap:eval} we empirically evaluate \mysketch. We show an update speedup of $12$x and a query speedup of $30$x over the sequential sketch, both with linear speedup. We compare \mysketch to FCDS, which is the state-of-the-art in concurrent sketches, and show that for FCDS to achieve similar performance it requires an order of magnitude larger buffers that \mysketch, reducing query freshness tenfold.
+
+In Chapter~\ref{chap:correctness} we present a formal correctness proof. 
 
 In the supplementary material we formally define the system model and present formal correctness proofs.
 

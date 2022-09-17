@@ -1,17 +1,54 @@
 \chapter{Holes Analysis Proofs}
-\label{appendix:holes-pi-mono}
+\label{appendix:holes}
 
 To show the bound on the expected number of holes, we present some claims. 
+
 In Section~\ref{sec:holes-analysis} we show in Equation~\ref{eq:pi-i-j} that 
 \begin{align*}
 \pi_{i,j} \leq \left(\frac{1}{2}\right)^{jb + 2i +1} {{jb+2i} \choose i}.
 \end{align*}
-Consider the following function:
+Consider the following functions:
 \begin{align*}
-f_1(i) \triangleq \left(\frac{1}{2}\right)^{jb + 2i +1} {{jb+2i} \choose i}.
+f_1(i) &\triangleq \left(\frac{1}{2}\right)^{jb + 2i +1} {{jb+2i} \choose i}. \\
+f_2(i) &\triangleq \frac{1}{4} \cdot \frac{(jb+2i+2)(jb+2i+1)}{(jb+i+1)(i+1)}. \\
+f_3(j) &\triangleq \frac{1}{4} \cdot \frac{(jb+2b)(jb+2b-1)}{(jb+b)b}.
 \end{align*}
 
-\begin{claim}\label{claim:holes-f-1}
+\begin{claim}\label{claim:f-2-dec}
+$f_2(i)$ is monotonically decreasing for $0 \leq i \leq b-1$ and for $j,b>2 \in \mathds{N}$. 
+\end{claim}
+
+\begin{proof}
+\begin{align*}
+    f_2(i+1) &= \frac{1}{4} \cdot \frac{(jb+2i+4)(jb+2i+3)}{(jb+i+2)(i+2)}.
+\end{align*}
+We show that $\frac{f_2(i+1)}{f_2(i)} \leq 1$ for $0 \leq i \leq b-2$.
+\begin{align*}
+    \frac{f_2(i+1)}{f_2(i)} &= \frac{(jb+2i+4)}{(jb+2i+2)} \cdot \frac{(jb+2i+3)}{(jb+2i+1)} \cdot \frac{(jb+i+1)}{(jb+i+2)} \cdot \frac{(i+1)}{(i+2)} 
+    % \\
+    % &\leq \underbrace{\frac{(jb+2i)}{(jb+2i+2)}}_{\leq 1} \cdot \underbrace{\frac{(jb+2i)}{(jb+2i+1)}}_{\leq 1} \cdot \underbrace{\frac{(jb+i+1)}{(jb+i+2)}}_{\leq 1} \cdot \underbrace{\frac{(i+1)}{(i+2)}}_{\leq 1} 
+    \leq 1
+\end{align*}
+\end{proof}
+
+\begin{claim}\label{claim:f-3-inc}
+$f_3(j)$ is monotonically increasing for $j,b>2 \in \mathds{N}$. 
+\end{claim}
+
+\begin{proof}
+\begin{align*}
+    f_3(j+1) = \frac{1}{4} \cdot \frac{(jb+3b)(jb+3b-1)}{(jb+2b)b}.
+\end{align*}
+We show that $\frac{f_3(j+1)}{f_3(j)} \geq 1$ for $j,b>2 \in \mathds{N}$
+\begin{align*}
+    \frac{f_3(j+1)}{f_3(j)} &= \underbrace{\frac{(jb+3b)}{(jb+2b)}}_{\geq 1} \cdot \underbrace{\frac{(jb+3b-1)}{(jb+2b-1)}}_{\geq 1} \cdot \frac{(jb+b)}{(jb+2b)} \\
+    &\geq \frac{(jb+b)}{(jb+2b)} \geq \frac{(jb+2b)}{(jb+2b)}
+    \geq 1 
+\end{align*}
+\end{proof}
+
+
+\begin{claim}\label{claim:holes-pi-mono}
 $f_1(i)$ is monotonically increasing for $i \in \{0,1,\dots,b-1\}$ and for $j,b \in \mathds{N}$. 
 \end{claim}
 
@@ -24,7 +61,7 @@ For $b=2$, $i \in {0,1}$ thus,
             &= \left(\frac{1}{2}\right)^{2j+1} \cdot \left(\frac{1}{2}\right)^{2} \cdot (2j+2)\\
             &= f_1(0) \cdot \frac{2j+2}{4} \geq f_1(0) \cdot \frac{2+2}{4} = f_1(0).
 \end{align*}
-For $b>2$, we show that $f_1(i+1)\geq f_1(i)$ for all $i \in \{0,1,\dots,b-2\}$ and for $j,b \in \mathds{N}$
+For $b>2$, we show that $f_1(i+1)\geq f_1(i)$ for all $0 \leq i \leq b-1$ and for $j,b \in \mathds{N}$
 
 \begin{align*}
     f_1(i) &= \left(\frac{1}{2}\right)^{jb + 2i +1} {{jb+2i} \choose {i}} \\
@@ -33,18 +70,67 @@ For $b>2$, we show that $f_1(i+1)\geq f_1(i)$ for all $i \in \{0,1,\dots,b-2\}$ 
     &= f_1(i) \cdot \frac{1}{4} \cdot \frac{(jb+2i+2)(jb+2i+1)}{(jb+i+1)(i+1)}
 \end{align*}
 
-Consider the following function, 
+Claim~\ref{claim:f-2-dec} shows that $f_2(i) = \frac{1}{4} \cdot \frac{(jb+2i+2)(jb+2i+1)}{(jb+i+1)(i+1)} $ is monotonically decreasing for $0\leq{i}\leq{b-1}$. 
+Denote by $f_3(j)$ to be $f_2(b-1)$,
 \begin{align}
-    
+    f_3(j) &\triangleq \frac{1}{4} \cdot \frac{(jb+2b)(jb+2b-1)}{(jb+b)b}
 \end{align}
 
+Claim~\ref{claim:f-3-inc} shows that $f_3(j)$ is monotonically increasing. 
+\begin{align*}
+    f_3(1) &= \frac{1}{4} \cdot \frac{(3b)(3b-1)}{2b^2} = \frac{9b-3}{8b} \underbrace{=}_{b\geq 3} \frac{9b-b}{8b} \geq 1
+\end{align*}
 
-Consider the following function:
-\[g(x) = \frac{1}{4} \cdot \frac{(jb+2x+2)(jb+2x+1)}{(jb+x+1)(x+1)}.\]
-It is monotonically decreasing for $0 \leq x \leq b-1$. Consider $g(b-2)$:
-\[\frac{1}{4} \cdot \frac{(jb+2b-2)(jb+2b-3)}{(jb+b-1)(b-1)}.\]
-Denote this function as $h(j)$.
-\[h(1) = \frac{1}{4} \cdot \frac{(3b-2)(3b-3)}{(2b-1)(b-1)} \geq 9/8\]
-Furthermore, $h(j)$ is a monotonically increasing function, therefore $h(j) \geq 1$ for all $j \geq 1$.
+Therefore, $f_3(j) \geq 1$ for all $j\geq1$.
+With this we have shown that 
+\begin{align*}
+f_1(i+1) = f_1(i) \cdot \frac{1}{4} \cdot \frac{(jb+2i+2)(jb+2i+1)}{(jb+i+1)(i+1)} \geq f_1(i)
+\end{align*}
 
+\end{proof}
+
+\begin{claim}\label{claim:g-1}
+$g_1(b) \triangleq \frac{3b-1}{b}$ bounded by 3.
+\end{claim}
+
+\begin{proof}
+\begin{align*}
+    g_1(b) = \frac{3b-1}{b} < \frac{3b}{b} < 3
+\end{align*}
+\end{proof}
+
+\begin{claim}\label{claim:g-2}
+$g_2(b) \triangleq \frac{3b+1}{2b+1}$ bounded by 1.5.
+\end{claim}
+
+\begin{proof}
+\begin{align*}
+    g_2(b) = \frac{3b+1}{2b+1} = \frac{(2b+1) + b }{2b+1} = 1 + \frac{b}{2b+1} < 1 + \frac{b}{2b} < 1.5
+\end{align*}
+\end{proof}
+
+\begin{claim}\label{claim:g-3}
+$g_3(b) \triangleq \frac{(b+1)^2}{b^2}$ is monotonically decreasing and for $b=12$, $g_3(b)= \left(\frac{13}{12}\right)^2$ 
+\end{claim}
+
+\begin{proof}
+The proof is immediate. 
+\end{proof}
+
+\begin{claim} \label{claim:E-H-j-help}
+$\left(\frac{1}{2}\right)^{b-1} \cdot {{jb+3b-2} \choose {b-1}} \leq {{jb+2b-2} \choose {b-1}}$ for all $b\in \mathds{N}$ and $j\geq1, j\in \mathds{N}$. 
+\end{claim}
+
+\begin{proof}
+\begin{align*}
+    & \left(\frac{1}{2}\right)^{b-1} \cdot {{jb+3b-2} \choose {b-1}} = \\
+    & \left(\frac{1}{2}\right)^{b-1} \cdot \frac{(jb+3b-2)!}{(b-1)!(jb+2b-1)!} =\\
+    & \left(\frac{1}{2}\right)^{b-1} \cdot \frac{(jb+2b-2+b)!}{(b-1)!(jb+b-1+b)!} =\\
+    & \left(\frac{1}{2}\right)^{b-1} \cdot \frac{(jb+2b-2)!}{(b-1)!(jb+b-1)!} \cdot 
+    \frac{(jb+2b-2+1)\cdots(jb+2b-2+b)}{(jb+b-1+1)\cdots(jb+b-1+b)} =\\
+    & \left(\frac{1}{2}\right)^{b-1} \cdot {{jb+2b-2} \choose {b-1}} \cdot \prod_{t=1}^b \frac{jb+2b-2+t}{jb+b-1+t} =\\
+    & {{jb+2b-2} \choose {b-1}} \cdot \prod_{t=1}^b \frac{jb+2b-2+t}{2(jb+b-1+t)} =\\
+    & {{jb+2b-2} \choose {b-1}} \cdot \underbrace{\prod_{t=1}^b \frac{jb+2b-2+t}{(jb+2b-2+t)+jb+t}}_{\leq1} \leq {{jb+2b-2} \choose {b-1}}
+\end{align*}
+for all $b,j\in \mathds{N}$ such that $j\geq1$.
 \end{proof}
