@@ -18,58 +18,177 @@
 % category", that's a hack discussed here:
 % https://tex.stackexchange.com/q/630541/5640 
 
-\newacronym[%
-  category=notation-category,%
-  description=``The Senate and People of Rome'']% The description does not appear anywhere by default
-  {spqr}% the key of the acronym (used with the \gls command for example)
-  {SPQR}% the short form of the acronym
-  {Senātus Populusque Rōmānus}% the long form of the acronym
+% \newacronym[%
+%   category=notation-category,%
+%   description=``The Senate and People of Rome'']% The description does not appear anywhere by default
+%   {spqr}% the key of the acronym (used with the \gls command for example)
+%   {SPQR}% the short form of the acronym
+%   {Senātus Populusque Rōmānus}% the long form of the acronym
+
+% \newacronym[%
+%   category=notation-category,%
+% description=A technology used in data storage devices]%
+%   {smart}{SMART}{Self-Monitoring, Analysis and Reporting Technology}
+
+% \newacronym[%
+%   category=notation-category,%
+%   description=to build or produce something{,} rather than purchasing it ready-made or paying someone to make it]%
+%   {DIY}{DIY}{do it yourself}
+
+% \newacronym[%
+%   category=notation-category,%
+%   description=a four-letter acronym]
+%   {etla}
+%   {ETLA}
+%   {extended three-letter acronym}
+
+% \newabbreviation[%
+%   type=notation,%
+%   category=notation-category,%
+%   description=]% This abbreviation has no description; only the abbreviation and the unabbreviated form will be shown
+%   {aut}{Aut}{Automorphism group}
+
+% \newglossaryentry{symb:c}{%
+%   type=notation,%
+%   category=notation-category,%
+%   name=$c$,%
+%   description=the speed of light%
+% }
+
+% \newglossaryentry{symb:a-b-closed}{%
+%   type=notation,%
+%   category=notation-category,%
+%   name=\ensuremath{a \pm b},%
+%   description=the closed interval \ensuremath{\left[a-b,a+b\right]}%
+% }
+
+% \newglossaryentry{supercali}{%
+%   type=notation,%
+%   category=notation-category,%
+%   name=supercalifragilisticexpialidocious,
+%   description=%
+%     Atoning for being educable through delicate beauty;
+%     Something to say when you have nothing to say.}
 
 \newacronym[%
   category=notation-category,%
-description=A technology used in data storage devices]%
-  {smart}{SMART}{Self-Monitoring, Analysis and Reporting Technology}
+  description=]%
+  {API} %the key of the acronym (used with the \gls command for example)
+  {API} % the short form of the acronym
+  {Application Programming Interface} % the long form of the acronym
+  
+\newacronym[%
+  category=notation-category,%
+  description= atomic operation which takes a memory address${\textit{,}}$ an expected value and a new value${\textit{,}}$ compares the actual value with the expected value and if they match${\textit{,}}$ atomically swap the actual value with the new value]%
+  {CAS}{CAS}{Compare-And-Swap}
 
 \newacronym[%
   category=notation-category,%
-  description=to build or produce something{,} rather than purchasing it ready-made or paying someone to make it]%
-  {DIY}{DIY}{do it yourself}
-
+  description= atomic operation which takes two addresses${\textit{,}}$ two corresponding expected values and two new values as arguments${\textit{,}}$ and atomically updates both addresses if they both match their expected value]%
+  {DCAS}{DCAS}{Double-Compare-Double-Swap}
+    
 \newacronym[%
   category=notation-category,%
-  description=a four-letter acronym]
-  {etla}
-  {ETLA}
-  {extended three-letter acronym}
-
-\newabbreviation[%
-  type=notation,%
+  description= can read fields that are concurrently modifies by a DCAS]%
+  {DCASREAD}{DCAS\_READ}{Wait-free read operation}
+    
+\newacronym[%
   category=notation-category,%
-  description=]% This abbreviation has no description; only the abbreviation and the unabbreviated form will be shown
-  {aut}{Aut}{Automorphism group}
-
-\newglossaryentry{symb:c}{%
-  type=notation,%
+  description=]%
+  {FA}{F\&A}{Fetch-And-Add}
+  
+  \newacronym[%
   category=notation-category,%
-  name=$c$,%
-  description=the speed of light%
-}
+  description= $A$ is a PAC learning algorithm if for given $\epsilon>0$ and $\delta<1$ $A$ outputs a hypothesis $h$ that has an average error less than or equal to $\epsilon$ on the samples with probability at least $1-\delta$]%
+  {PAC Learning}{PAC Learning}{Probably Approximately Correct Learning}
 
-\newglossaryentry{symb:a-b-closed}{%
-  type=notation,%
+  \newacronym[%
   category=notation-category,%
-  name=\ensuremath{a \pm b},%
-  description=the closed interval \ensuremath{\left[a-b,a+b\right]}%
-}
+  description= A PAC Quantiles sketch with parameters $\epsilon$ and $\delta$ return an element $x$ for query($\phi$) after $n$ updates such that $R(A{\textit{,}}x) \in {[}(\phi-\epsilon)n{\textit{,}}(\phi+\epsilon)n{]}$ with probability at least $1-\delta$]%
+  {PACQS}{PAC Quantiles Sketch}{Probably Approximately Correct Quantiles Sketch}
 
-\newglossaryentry{supercali}{%
-  type=notation,%
+
+  \newacronym[%
   category=notation-category,%
-  name=supercalifragilisticexpialidocious,
-  description=%
-    Atoning for being educable through delicate beauty;
-    Something to say when you have nothing to say.}
+  description= framework proposed by Rinberg et al.~\cite{Rinberg_2020_fast_sketches} for building concurrent data sketches]%
+  {FCDS}{FCDS}{Fast Concurrent Data Sketches}
 
+
+  \newacronym[%
+  category=notation-category,%
+  description=]%
+  {epsilon}{$\epsilon$}{Bound on the estimation error}
+  
+  \newacronym[%
+  category=notation-category,%
+  description=]%
+  {delta}{$\delta$}{Bound on the failure probability}
+
+  \newacronym[%
+  category=notation-category,%
+  description=]%
+  {N}{$N$}{Number of update threads}
+  
+\newacronym[%
+  category=notation-category,%
+  description=]%
+  {b}{$b$}{Size of threads' local buffer}
+
+  \newacronym[%
+  category=notation-category,%
+  description=]%
+  {S}{$S$}{Number of NUMA nodes}
+
+  \newacronym[%
+  category=notation-category,%
+  description=]%
+  {k}{$k$}{The sketch summary size}
+  
+
+  \newacronym[%
+  category=notation-category,%
+  description= memory design used in multiprocessing where the memory access time depends on the memory location relative to the processor]%
+  {NUMA}{NUMA}{Non-Uniform-Memory-Access}
+
+  \newacronym[%
+  category=notation-category,%
+  description=]%
+  {cdf}{CDF}{Cumulative Distribution Function}
+
+  \newacronym[%
+  category=notation-category,%
+  description=]%
+  {holes}{Holes}{Occurrences where thread-local buffered elements are sporadically overwritten by others without being propagated${\textit{,}}$ and others are duplicated${\textit{,}}$ i${.}$e${.}{\textit{,}}$ propagated more than once }
+  
+\newacronym[%
+  category=notation-category,%
+  description= as long as this threshold does not exceed$\textit{,}$ the query is answered from the cached snapshot]%
+  {rho}{$\rho$}{Threshold for rebuilding a snapshot}
+  
+      \newacronym[%
+  category=notation-category,%
+  description=]%
+  {MAXLEVEL}{$\mathrm{MAX\_LEVEL}$}{Maximum number of levels in the sketch}
+
+    \newacronym[%
+  category=notation-category,%
+  description= given a stream $A$ with $n$ elements the rank of some $x$ (not necessarily in $A$) is the number of elements smaller than $x$ in $A$]%
+  {Rank}{$\mathrm{Rank(A\textit{, }x)}$}{Rank of an element $x$ in $A$}
+  
+      \newacronym[%
+  category=notation-category,%
+  description= given a stream $A$ with $n$ elements the $\phi$ quantile of $A$ is an element $x$ such that the rank of $x$ in $A$ is $\lfloor \phi n \rfloor$]%
+  {phiquantile}{$\phi-quantile$}{$\phi-quantile$ of $A$}
+  
+  \newacronym[%
+  category=notation-category,%
+  description= an interval-based approach to memory management for concurrent data structures]%
+  {IBR}{IBR}{Interval-Based-Reclamation}
+  
+    \newacronym[%
+  category=notation-category,%
+  description=]%
+  {way merge}{K-way merge}{Merge algorithm consisting of merging K sorted arrays to produce a single sorted array with the same elements}
 % --------------------------------
 
 % Commands below will control the behavior/appearance of the list of abbreviations and acronyms
@@ -77,4 +196,4 @@ description=A technology used in data storage devices]%
 % Uncomment this command to have _all_ abbreviations and acronyms defined
 % in this file appear in the final list - rather than just the ones you
 % use in the thesis
-%\keepUnusedAbbreviations
+\keepUnusedAbbreviations

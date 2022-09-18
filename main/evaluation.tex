@@ -2,7 +2,7 @@
 \chapter{Evaluation}
 \label{chap:eval}
 
-In this chapter we measure \mysketch's throughput and estimation accuracy. 
+In this chapter we measure \mysketch's throughput and accuracy of estimation. 
 Section~\ref{sec:setup} presents the experiment setup and methodology.
 Section~\ref{sec:tput} presents throughput measurements and discusses scalability.
 Section~\ref{sec:params} experiments with different parameter setting, examining how performance is affected by query freshness. 
@@ -57,7 +57,7 @@ We measured \mysketch's throughput in three workloads:
 \end{figure*}
 
 
-As shown in Figure \ref{fig:update_only_speedup}, \mysketch's performance with a single thread is similar to the sequential algorithm and with more threads it scales linearly, reaching $12x$ the sequential throughput with 32 threads. 
+As shown in Figure \ref{fig:update_only_speedup}, \mysketch's performance in the update-only workload with a single thread is similar to the sequential algorithm and with more threads it scales linearly, reaching $12x$ the sequential throughput with 32 threads. 
 %Recall that the bottleneck of threads on the same NUMA node is sorting the buffer of size $2k$. As described in Section~\ref{Section: concurrent_algorithm}, the first two stages of \mysketch's update operation include filling and sorting threads local buffers and sorting the two G\&SBuffers. Note that the fill can be done concurrently, but the sort is sequential. The first $8$ threads running on the first NUMA node reach a peak and the empirical results match the theoretical expectations. For $N>8$, the throughput increases with the number of threads as adding NUMA nodes increases concurrency.
 We observe that the speedup is faster with fewer threads, we believe this is because once there are more than $8$ threads, the shared object is accessed from multiple NUMA nodes.
 %, thus the throughput above $8$ threads doesn't scale in the same manner as with the first $8$ threads. 
@@ -66,9 +66,9 @@ We observe that the speedup is faster with fewer threads, we believe this is bec
 Figure~\ref{fig:query_only_throughput} shows that, as expected, the throughput of the query-only workload scales linearly with the number of query threads, reaching $30x$ the sequential throughput with 32 threads.
 
 
-In the mixed workload, the parameter $\rho$ is significant for performance - when $\rho = 0$ (no caching), a snapshot it reproduced on every query.
+In the mixed workload, the parameter $\rho$ is significant for performance - when $\rho = 1$ ($\epsilon'=0$, no caching), a snapshot it reproduced on every query.
 % We compare performance with $\rho = 0$ and $\rho = 0.05$.
-Figure~\ref{fig:mixed_throughput} presents the update throughput (left) and query throughput (right) in the presence of $1$ or $2$ update threads, with staleness thresholds of $\rho=0$ and $\rho=0.05$. We see that the caching mechanism ($\rho > 0$) is indeed crucial for performance. As expected, increasing the staleness threshold allows queries to use their local (possibly stale) snapshot, servicing queries faster and greatly increasing the query throughout. Furthermore, more update threads decrease the query throughput, as the update threads interfere with the query snapshot. 
+Figure~\ref{fig:mixed_throughput} presents the update throughput (left) and query throughput (right) in the presence of $1$ or $2$ update threads, with staleness thresholds of $\rho=1 (\epsilon'=0)$ and $\rho=1.05 (\epsilon'=0.05)$. We see that the caching mechanism ($\rho > 1$) is indeed crucial for performance. As expected, increasing the staleness threshold allows queries to use their local (possibly stale) snapshot, servicing queries faster and greatly increasing the query throughout. Furthermore, more update threads decrease the query throughput, as the update threads interfere with the query snapshot. 
 Finally, increasing the number of query threads decreases the update throughput, as query threads interfere with update threads, presumably due to cache invalidations of the shared state.
 
 
@@ -132,7 +132,8 @@ We see that \mysketch's estimations are similar to the sequential ones using the
     \label{fig: accuracy_stderr}
 \end{figure}
 
-To illustrate the impact of $k$ visually, Figure~\ref{fig:cdf} compares the distribution measured by \mysketch (red open-circles) to the exact (full information) stream distribution (green CDF filled-circles). In Figure~\ref{fig:intro-query-accuracy} (in the introduction), we depict the accuracy of \mysketch's estimate of a normal distribution with $k=1024$. Figure~\ref{fig:cdf_normal} (left) shows that when we reduce $k$ to $32$, the approximation is less tight while for $k=256$ (Figure~\ref{fig:cdf_normal} right) it is very accurate. We observe similar results for the uniform distribution in Figure~\ref{fig:cdf_uniform}. We experimented with additional distributions with similar results, which are omitted due to space limitations. \todo[color=red]{ask if to remove}
+To illustrate the impact of $k$ visually, Figure~\ref{fig:cdf} compares the distribution measured by \mysketch (red open-circles) to the exact (full information) stream distribution (green CDF filled-circles). In Figure~\ref{fig:intro-query-accuracy} (in the introduction), we depict the accuracy of \mysketch's estimate of a normal distribution with $k=1024$. Figure~\ref{fig:cdf_normal} (left) shows that when we reduce $k$ to $32$, the approximation is less tight while for $k=256$ (Figure~\ref{fig:cdf_normal} right) it is very accurate. We observe similar results for the uniform distribution in Figure~\ref{fig:cdf_uniform}. 
+% We experimented with additional distributions with similar results, which are omitted due to space limitations. \todo[color=red]{ask if to remove}
 
 \begin{figure}[h!]
 \centering
