@@ -15,7 +15,7 @@ Our algorithm is randomised and we consider a weak adversary that determines the
 
 As previously mentioned, we adopt a flavor of \emph{relaxed semantics}, as defined in \cite{Henzinger_2013_Quantitative_Relaxation}:
 
-\begin{definition}[$r$-relaxation] \label{def:def:r-relaxtion}
+\begin{definition}[$r$-relaxation] \label{def:r-relaxtion}
 A sequential history $H$ is an \emph{$r$-relaxation} of a sequential history H', if H is comprised of all but at most $r$ of the invocations in $H'$ and their responses,
 and each invocation in $H$ is preceded by all but at most $r$ of the invocations that precede the same invocation in $H'$.
 The $r$-relaxation of a sequential specification $\mathcal{H}$ is the set of histories that have $r$-relaxations in $\mathcal{H}$:

@@ -179,40 +179,67 @@ If $\mathnormal{O}$ is a query then the proof is immediate since the visibility 
 
 Note that as query linearisation point is equal to its visibility point, all queries in $f(\sigma)$ will also be in $l(\sigma)$. 
 
+We give an upper bound on the number of updates in NUMA-local buffers.
+
 \begin{lemma}\label{Lem: GSBuffer_updates_num}
 Given a finite execution $\sigma$ of \mysketch, the maximum number of unpropagated update operations in all Gather\&Sort units is \(4kS\), where $S$ is the number of NUMA nodes: \[|\mathit{up\_suffix}(\sigma)| \leq 4kS.\]
 \end{lemma}
 \begin{proof}
-If an update operation is included in \(\mathit{up\_suffix}(\sigma)\), the size of the array in G\&SBuffer that the update is a member of, is less-equal $2k$. By definition, if both arrays in a Gather\&Sort unit are full, no update thread (pinned to the same node as the Gather\&Sort unit) can copy his local buffer's elements. It follows that \(|\mathit{up\_suffix}(\sigma)| \leq 4kS\).
+If an update is included in \(\mathit{up\_suffix}(\sigma)\), by definition, it is included in one of the G\&SBuffers. The size of each G\&SBuffer is less then or equal $2k$. By definition, if both arrays in a Gather\&Sort unit are full, no update thread (pinned to the same node as the Gather\&Sort unit) can copy his local buffer's elements. It follows that \(|\mathit{up\_suffix}(\sigma)| \leq 4kS\).
 \end{proof}
 
-We give an upper bound on the number of updates in a threads local buffers.
+Now, we give an upper bound on the number of updates in threads' local buffers.
 
 \begin{lemma}\label{Lem: local_updates_num}
-Given a finite execution \s of \mysketch, the number of unpropagated updates in the local buffer of thread \(T_i\) is bounded by b, \[|up\_suffix_i(\sigma)| \leq b\]
+Given a finite execution $\sigma$ of \mysketch, the number of unpropagated updates in the local buffer of a thread \(T_i\) is bounded by b, \[|\mathit{up\_suffix_i}(\sigma)| \leq b\]
 \end{lemma}
 \begin{proof}
-If update is included in \(up\_suffix_i(\sigma)\) , it follows that \(|items_buf_i| \leq b\) and therefore \(|up\_suffix_i(\sigma)| \leq |items_buf_i| \leq b \). When the local buffer of thread \(T_i\) is full, it copies \(items_buf_i\) to one of the G\&SBuffer's arrays and the corresponding updates will not be included in \(up\_suffix_i(\sigma)\).
+If an update is included in \(\mathit{up\_suffix_i}(\sigma)\), by definition, it is included in $T_i$ local buffer. 
+As the size of threads' local buffer is $b$, it follows that $|\mathit{up\_suffix_i}(\sigma)| \leq b$. 
+Note that when the local buffer of thread \(T_i\) is full, it copies \(items_buf_i\) to one of the G\&SBuffers and the corresponding updates will not be included in \(up\_suffix_i(\sigma)\).
 \end{proof}
 
-To prove that \fs is an \((4kS + (N-S)b)\)-relaxation of \ls, first, we will show that \fs comprised of all but at most \(r=4kS + (N-S)b\) invocations in \ls and their responses.
+To prove that $f(\sigma)$ is an \((4kS + (N-S)b)\)-relaxation of $l(\sigma)$, first, we will show that $f(\sigma)$ comprised of all but at most \(r=4kS + (N-S)b\) updates invocations in $l(\sigma)$ and their responses.
 
 \begin{lemma} \label{Lem: invocations_bound}
-Given a finite execution \s of \mysketch, \[ |f(\sigma)| \ge |l(\sigma)| - (4kS + (N-S)b) \]
+Given a finite execution $\sigma$ of \mysketch, \[ |f(\sigma)| \ge |l(\sigma)| - (4kS + (N-S)b) \]
 \end{lemma}
 \begin{proof}
-\ls contains all updates, \fs contains all updates with visibility points. Updates without visibility points are the unpropagated updates in G\&SBuffers and unpropagated updates in the local buffer of each update thread. There are \(N\) update threads, therefore, excluding S update thread that may continue, \(|f(\sigma)| = |l(\sigma)| - (\sum_{i=1}^{N-S}|up\_suffix_i(\sigma)|) - |up\_suffix(\sigma)|\). From Lemma \ref{Lem: local_updates_num}, \(|up\_suffix_i(\sigma)| \leq b\) and from Lemma \ref{Lem: GSBuffer_updates_num}, \(|up\_suffix(\sigma)| \leq S \cdot 4k\). Therefore, \(|f(\sigma)| \ge |l(\sigma)| - (4kS + (N-S)b)\).
+The linearization $l(\sigma)$ contains all updates that have been inserted to a thread locak buffer. $f(\sigma)$ contains all updates with visibility points, i.e., updates that have been propagated into the first level global sketch. 
+An update, made by thread $T_i$, without a visibility point is in $T_i$ local buffer or in one of the NUMA-local buffers of the G\&Sort unit that $T_i$ is pinned to. By definition, updates without visibility points are the unpropagated updates in G\&SBuffers and the unpropagated updates in the local buffer of each update thread. Each G\&Sort unit has an owner thread that tries to batch update into the global sketch. As such, for \(N\) update threads, $S$ update threads' local buffer is empty as each of they is an owner thread of a G\&Sort unit. Therefore,
+\begin{equation}
+    |f(\sigma)| = |l(\sigma)| - \left(\sum_{i=1}^{N-S}|\mathit{up\_suffix_i}(\sigma)|\right) - |\mathit{up\_suffix}(\sigma)|
+\end{equation}
+From Lemma \ref{Lem: local_updates_num}, \(|\mathit{up\_suffix_i}(\sigma)| \leq b\) and from Lemma \ref{Lem: GSBuffer_updates_num}, \(|\mathit{up\_suffix}(\sigma)| \leq S \cdot 4k\). Therefore,
+\begin{equation}
+    |f(\sigma)| \ge |l(\sigma)| - (4kS + (N-S)b)
+\end{equation}
+
 \end{proof}
 
-To complete the poof that \fs is an \((4kS + (N-S)b)\)-relaxation of \ls, we will show that each invocation in \fs is preceded by all but at most \((4kS + (N-S)b)\) of the invocations that precede the same invocation in \ls.
+To complete the poof that $f(\sigma)$ is an \((4kS + (N-S)b)\)-relaxation of $l(\sigma)$, we will show that each invocation in $f(\sigma)$ is preceded by all but at most \((4kS + (N-S)b)\) of the invocations that precede the same invocation in $l(\sigma)$.
 
 \begin{lemma}\label{Lem: relaxation}
-Given a finite execution \s of \mysketch, \fs is an \((4kS + (N-S)b)\)-relaxation of \ls.
+Given a finite execution $\sigma$ of \mysketch, $f(\sigma)$ is an \((4kS + (N-S)b)\)-relaxation of $l(\sigma)$.
 \end{lemma}
 \begin{proof}
-Let O be an operation in \fs such that O is also in \ls. Let \(Ops\) be a collection of operations preceded O in \ls but not preceded O in \fs, i.e \( Ops=\{O'| O' \prec_{l(\sigma)} O \wedge  O' \nprec_{f(\sigma)} O \} \). By Lemma \ref{Lem: op_order}, query \( Q \notin Ops \). Let \(\sigma^{pre}\) be the prefix of \s and let \(\sigma^{post}\) be the suffix of \s such that \( l(\sigma)=\sigma^{pre},O,\sigma^{post} \). From Lemma \ref{Lem: local_updates_num}, \(|f(\sigma^{pre})| \ge |l(\sigma^{post})| - (4kS + (N-S)b))\). As \(|f(\sigma^{pre})|\) is the number of updates preceded O in \(f(\sigma^{pre})\), and \(|l(\sigma^{pre})|\) is the number of updates preceded O \(l\sigma^{pre})\), it follows that \(|Ops| = |l(\sigma^{pre})|-|f(\sigma^{pre})| \leq |l(\sigma^{pre})|-(|l(\sigma^{post})| - (4kS + (N-S)b))\leq (4kS + (N-S)b)\). Therefore, by Definition \ref{Def: relaxation}, \fs is an \((4k+b(N-1))\)-relaxation of \ls.
+Let $\mathnormal{O}$ be an operation in $f(\sigma)$ such that $\mathnormal{O}$ is also in $l(\sigma)$. Let $\mathnormal{Ops}$ be a collection of operations preceded $\mathnormal{O}$ in $l(\sigma)$ but not preceded $\mathnormal{O}$ in $f(\sigma)$, i.e.,
+\begin{align}
+    \mathnormal{Ops}=\{\mathnormal{O}'| \mathnormal{O}' \prec_{l(\sigma)} \mathnormal{O} \wedge  \mathnormal{O}' \nprec_{f(\sigma)} \mathnormal{O} \}.
+\end{align}
+By Lemma \ref{Lem: op_order}, as query linearization point is equal to its visibility point, query is in $f(\sigma)$ if and only is it is in $l(\sigma)$. Thus \( \mathnormal{Q} \notin \mathnormal{Ops} \) i.e., $\mathnormal{Ops}$ includes only update operations. Let \(\sigma^{pre}\) be the prefix of $\sigma$ and let \(\sigma^{post}\) be the suffix of $\sigma$ such that
+\begin{align}
+ l(\sigma)=\{\sigma^{pre},\mathnormal{O},\sigma^{post}\}.
+\end{align}
+From Lemma \ref{Lem: invocations_bound}, \(|f(\sigma^{pre})| \ge |l(\sigma^{pre})| - (4kS + (N-S)b))\). As \(|f(\sigma^{pre})|\) is the number of updates preceded $\mathnormal{O}$ in \(f(\sigma^{pre})\), and \(|l(\sigma^{pre})|\) is the number of updates preceded $\mathnormal{O}$ in \(l(\sigma^{pre})\), it follows that
+\begin{align}
+    |\mathnormal{Ops}| &= |l(\sigma^{pre})|-|f(\sigma^{pre})| \\
+                       &\leq |l(\sigma^{pre})|-(|l(\sigma^{pre})| - (4kS + (N-S)b))\\
+                       &\leq (4kS + (N-S)b).
+\end{align}
+Therefore, by Definition \ref{def:r-relaxtion}, $f(\sigma)$ is an \((4k+b(N-1))\)-relaxation of $l(\sigma)$.
 \end{proof}
 
-Finally, we have proven that given a finite execution \s of \emph{Quancurrent}, \ls is strongly linearizable, \(f(\sigma) \in SeqSketch\) and \fs is an \((4kS + (N-S)b)\)-relaxation of \ls. We have proven Lemma \ref{Lem: sl_relaxation}.
+Finally, we have proven that given a finite execution $\sigma$ of \mysketch, $l(\sigma)$ is strongly linearizable, \(f(\sigma) \in SeqSketch\) and $f(\sigma)$ is an \((4kS + (N-S)b)\)-relaxation of $l(\sigma)$. We have proven Lemma \ref{Lem: sl_relaxation}.
 
 \end{proof}
