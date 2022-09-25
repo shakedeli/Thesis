@@ -35,8 +35,8 @@ We show that using this architecture, high throughput can be achieved with much 
 
 \begin{figure}[htp]
     \centering
-    % \includegraphics[width=0.8\linewidth,trim={0cm 0cm 0cm 0.3cm},clip]{graphics/algorithm/Quancurrent structure intro.pdf}
-        \includegraphics[width=0.8\linewidth,trim={0cm 0cm 0cm 0.3cm},clip]{graphics/algorithm/Quancurrent_structure_intro.pdf}
+    \hspace{70pt}
+        \includegraphics[width=0.8\linewidth,trim={0cm 0cm 0cm 0.1cm},clip]{graphics/algorithm/Quancurrent_structure_intro.pdf}
     \caption{\mysketch's architecture.}
     \label{fig:quancurrentDS}
 \end{figure}
@@ -51,7 +51,7 @@ Figure~\ref{fig:intro-query-accuracy} presents quantiles estimated by \mysketch 
     \centering
     \includegraphics[width=\linewidth,trim={0cm 0.3cm 0cm 1.5cm},clip]
     {graphics/graphs/accuracy/Oracle_Quancurrent_blocking_numa_cdf_normal_k1024_b16_keys10M_runs1_uT32_qT1_snapshot1_17-09-2022_07-00-49.pdf}
-    \caption{\mysketch quantiles vs. exact CDF, k = 1024, normal distribution, 32 update threads, 10M elements.}
+    \caption{\mysketch's $\phi$-quantiles vs. exact CDF (normal distribution, $k=1024$, $32$ update threads, $10M$ elements).}
     \label{fig:intro-query-accuracy}
 \end{figure}
 

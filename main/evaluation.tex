@@ -34,14 +34,14 @@ We measured \mysketch's throughput in three workloads:
     \begin{subfigure}[]{0.49\textwidth}
         \centering
         \includegraphics[width=\textwidth,trim={0cm 0cm 1.9cm 2.6cm},clip] {graphics/graphs/throughput/oracle_Quancurrent_blocking_numa_update_k4096_b16_keys10M_Tup32_runs15_16-08-2022_05-29-07.pdf}
-        \caption{Update-only, 10M elements.}
+        \caption{Update-only, $10M$ elements.}
         \label{fig:update_only_speedup}
     \end{subfigure}
     % \hspace{-5em}
     \begin{subfigure}[]{0.49\textwidth}
         \centering
         \includegraphics[width=\textwidth,trim={0cm 0cm 1.9cm 2.6cm},clip] {graphics/graphs/throughput/oracle_Quancurrent_blocking_numa_query_k4096_b16_keys10M_Tup32_runs15_prefill10M_prefillT1_16-08-2022_05-38-28.pdf}
-        \caption{Query-only, 10M elements prefilled, 10M queries.}
+        \caption{Query-only, $10M$ elements prefilled, $10M$ queries.}
         \label{fig:query_only_throughput}
     \end{subfigure}
 
@@ -49,10 +49,10 @@ We measured \mysketch's throughput in three workloads:
         \centering
         \includegraphics[width=\textwidth,trim={0cm 0cm 0cm 1cm},clip]
         {graphics/graphs/throughput/oracle_Quancurrent_blocking_numa_update_query_k_4096_b16_keys10M_pre10M_preT1_runs15_Tu1-2_Tq2-30_snapshot1_rho_1_0-05_united_16-08-2022_07-09-08.pdf}
-        \caption{One or two update threads, up to 32 query threads, 10M elements inserted after a pre-fill of 10M elements.}
+        \caption{One or two update threads, up to $32$ query threads, $10M$ elements inserted after a pre-fill of $10M$ elements.}
         \label{fig:mixed_throughput}
     \end{subfigure}
-    \caption{\mysketch throughput, k=4096, b=16.}
+    \caption{\mysketch's throughput, $k=4096$, $b=16$.}
     \label{fig:throughput}
 \end{figure*}
 
@@ -94,14 +94,14 @@ In Figure~\ref{fig: update_query_compare_rho} we vary $\rho$, in a mixed update-
     \begin{subfigure}{\textwidth}
     \centering
     \includegraphics[width=0.7\textwidth,trim={0 0cm 0cm 0.7cm},clip]{graphics/graphs/parameters/oracle_Quancurrent_blocking_numa_compare_k_b16_keys10M_Tup32_runs15_04-07-2022_12-26-29.pdf}
-    \caption{Update-only, \#keys=10M, b=16.}
+    \caption{Update-only, \#keys = $10M$, $b=16$.}
     \label{fig: throughput_update_compare_k}
     \end{subfigure}
 \vfill
     \begin{subfigure}{\textwidth}
     \centering
     \includegraphics[width=0.7\textwidth,trim={0 0cm 0cm 0.7cm},clip]{graphics/graphs/parameters/oracle_Quancurrent_blocking_numa_compare_b_k4096_keys10M_Tup32_runs15_11-08-2022_20-12-56.pdf}
-    \caption{Update-only, \#keys=10M, k=4096.}
+    \caption{Update-only, \#keys = $10M$, $k=4096$.}
     \label{fig: throughput_update_compare_b}
     \end{subfigure}
 \vfill
@@ -109,10 +109,10 @@ In Figure~\ref{fig: update_query_compare_rho} we vary $\rho$, in a mixed update-
     \centering
     \includegraphics[width=0.7\textwidth,trim={0 0cm 0cm 0.7cm},clip]
     {graphics/graphs/parameters/oracle_Quancurrent_compare_rho_blocking_numa_k1024_b16_runs15_pre10M_pT1_keys10M_uT8_qT24_noUpdate_16-08-2022_09-20-38.pdf}
-    \caption{8 update threads, 24 query threads, \#keys=10M, k=1024 and b=16.}
+    \caption{$8$ update threads, $24$ query threads, \#keys = $10M$, $k=1024$ and $b=16$.}
     \label{fig: update_query_compare_rho}
     \end{subfigure}
-\caption{\mysketch parameters impact.}
+\caption{\mysketch's parameters impact.}
 \label{fig: parameters_exploration}
 \end{figure*}
 
@@ -126,7 +126,7 @@ We see that \mysketch's estimations are similar to the sequential ones using the
     \centering
     \includegraphics[width=0.8\textwidth,trim={0 0cm 0cm 1.7cm},clip]
     {graphics/graphs/accuracy/oracle_Quancurrent_block_numa_query_hist_stderr_qs_keys983040_runs1000_k_64_128_256_512_1024_2048_4096_b_8_16_32_T_8_32_11-08-2022_20-26-21.pdf}
-    \caption{Standard error of estimation in quiescent state, keys=1M, runs=1000.}
+    \caption{Standard error of estimation in quiescent state, keys = $1M$, runs = $1000$.}
     \label{fig: accuracy_stderr}
 \end{figure}
 
@@ -149,7 +149,7 @@ To illustrate the impact of $k$ visually, Figure~\ref{fig:cdf} compares the dist
         \caption{Normal distribution.} \label{fig:cdf_normal}
     \end{subfigure}
 
-\caption{\mysketch quantiles vs. exact CDF, with 32 threads, b=16, and a stream size of 10M.} \label{fig:cdf}
+\caption{\mysketch's $\phi$-quantiles vs. exact CDF, with $32$ threads, $b=16$, and a stream size of $10M$.} \label{fig:cdf}
 \end{figure}
 
 %============================================================
@@ -229,6 +229,6 @@ Overall, we see that FCDS requires large buffers (resulting in a high relaxation
 \begin{figure}[h]
 \includegraphics[width=\textwidth,trim={0cm 0cm 0cm 0cm},clip]
 {graphics/graphs/FCDS/oracle_Quancurrent_vs_FCDS_block_numa_up_k4096_keys10M_T8-32_runs15_equal_relax_log_largeB_rm_last2_diff_axes_name_16-09-2022_18-59-50.pdf}
-\caption{\mysketch vs. FCDS, k = 4096.}
+\caption{\mysketch vs. FCDS, $k=4096$.}
 \label{fig:compare_FCDS_k4096}
 \end{figure}

@@ -6,13 +6,13 @@ In Section~\ref{sec:holes-analysis} we analyze the expected number of holes, and
 \section{Holes Analysis}
 \label{sec:holes-analysis}
 
-Because the update operation moves elements from the thread's local buffer to a shared buffer non-atomically, holes may occur when the owner thread reads older elements that were written to the shared buffer in a previous window. The missed (delayed) writes may later overwrote newer writes. Together, for each hole, an old value is duplicated and a new value is dropped. As such, we created a dependency between samples because we dropped an independent sample and gave double weight to another. 
+Because the update operation moves elements from a thread's local buffer to a shared G\&SBuffer non-atomically, holes may occur when the owner thread reads older elements that were written to the shared buffer in a previous window. The missed (delayed) writes may later overwrote newer writes. Together, for each hole, an old value is duplicated and a new value is dropped. As such, we created a dependency between samples because we dropped an independent sample and gave double weight to another. 
 
-We analyze the expected number of holes under the assumption of a \emph{uniform stochastic scheduler}~\cite{alistarh2016lock}, which schedules each thread with a uniform probability in every step. That is, at each point in the execution, the probability for each thread to take the next step is $\frac{1}{N}$. Note that the holes are random and distributed from the same distribution. Therefore, they do not affect the samples' mean and only affect the accuracy of estimation. Below we show that the expected number of holes is fairly small and that they have a marginal effect on the estimation accuracy. 
+We analyze the expected number of holes under the assumption of a \emph{uniform stochastic scheduler}~\cite{alistarh2016lock}, which schedules each thread with a uniform probability in every step. That is, at each point in the execution, the probability for each thread to take the next step is $\frac{1}{N}$. Note that holes are random and distributed from the same distribution. Therefore, they do not affect the samples' mean and only affect the accuracy of estimation. Below we show that the expected number of holes is fairly small and that they have a marginal effect on the estimation accuracy. 
 
 Denote by $H$ the total number of holes in some batch of $2k$ elements. G\&SBuffer's array is divided into $\frac{2k}{b}$ regions, each consisting of $b$ slots populated by the same thread. Denote by $H_1,\dots, H_{\frac{2k}{b}}$ the number of holes in regions $1, \dots, \frac{2k}{b}$, respectively.
 
-The slots in region $j$ are written to by the thread that successfully increments the shared index from $(j-1)b$ to $jb$. We refer to this thread as $T_j$. Note that multiple regions may have the same writing thread. The shared buffer's owner, $T_O$, is $T_{\frac{2k}{b}}$. To initiate a batch update, $T_O$ creates a local copy of one G\&SBuffer by iteratively reading the array. A hole is read in some region $j$ if $T_O$ reads some index $i+1$ in this region before the writer thread $T_j$ writes to the corresponding index in the same region.
+The slots in region $j$ are written to by the thread that successfully increments the shared index from $(j-1)b$ to $jb$. We refer to this thread as $T_j$. Note that multiple regions may have the same writing thread. The shared G\&SBuffer's owner, $T_O$, is $T_{\frac{2k}{b}}$. To initiate a batch update, $T_O$ creates a local copy of his G\&SBuffer by iteratively reading the array. A hole is read in some region $j$ if $T_O$ reads some index $i+1$ in this region before the writer thread $T_j$ writes to the corresponding index in the same region.
 
 \paragraph*{Analysis of $\boldsymbol{H_j}$.} When $T_O$ increments the index from $2k-b$ to $2k$, $T_j$ may have completed any number of writes between $0$ and $b$ to region $j$. We first consider the case that $T_j$ hasn't completed any writes. In this case, for a hole to be read in slot $i+1$ of region $j$, $T_O$'s read of slot $i+1$ must overtake $T_j$'s write of the same slot. To this end, $T_O$ must write $b$ values (from its own local buffer), read $(j-1)b$ values from the first $j-1$ regions and then read values from slots $1,\dots,i+1$ in this region (a total of $b+(j-1)b+i+1$ steps), before $T_j$ takes $i+1$ steps. The probability that $T_O$ reads a hole in region $j$ for the first time, in slot $i+1$ is:
 \begin{align}
@@ -41,24 +41,23 @@ Using Equation~\ref{eq:p-j},
     p_j &\leq \sum_{i=0}^{b-1} \left(\frac{1}{2}\right)^{jb + 2b -1} {{jb+2b-2} \choose b-1}\\
     &\leq b \cdot \left(\frac{1}{2}\right)^{jb + 2b -1} {{jb+2b-2} \choose b-1} \label{eq:bound-p-j}
 \end{align}
-If $T_j$ has completed writes to region $j$, the probability that $T_O$ reads holes is even lower.
+If $T_j$ has completed any number of writes to region $j$, the probability that $T_O$ reads holes is even lower.
 %
 Therefore, the probability that $H_j \geq 1$ is bounded from above by $p_j$.
 Using this, we bound the expected total number of holes in region $j$:
-\[E\left[H_j\right]= P(H_j=0)\cdot 0 + P(H_j=1)\cdot 1 + \dots + P(H_j=b)\cdot b.\]
+\begin{align}
+E\left[H_j\right]= P(H_j=0)\cdot 0 + P(H_j=1)\cdot 1 + \dots + P(H_j=b)\cdot b.
+\end{align}
 $T_O$ can read at most $b$ holes, therefore,
 \begin{flalign}
 E\left[H_j\right] &< b\cdot \left(P(H_j=1) + \dots + P(H_j=b) \right) \\
                     &= b\cdot P(H_j\geq1) < b\cdot p_j. \label{eq:bound-E-H-j}
 \end{flalign}
-
 Next we show that $E[H_1]\leq1.4$ for all $b$.
-
 \begin{lemma}
 $E[H_1] \leq 1.4$ for all $b \in \mathds{N}$.
 \label{lemma:holes-H1}
 \end{lemma}
-
 \begin{proof}
 Denote 
 \begin{align}
@@ -89,9 +88,8 @@ That is, for all $b \in \mathds{N}$,
     \label{eq:bound-g-b}
 \end{align}
 From Equation~\ref{eq:bound-E-H-1} and Equation~\ref{eq:bound-g-b},
-\[\forall b\in \mathds{N}, \; E[H_{1}] \leq 1.4.\] 
+\[\forall b\in \mathds{N}, \; E[H_{1}] \leq 1.4.\]
 \end{proof}
-
 \begin{lemma} \label{lem:holes-Hj}
 If $E[h_j] \leq \alpha_{j}$, then $E[h_{j+1}] \leq \frac{1}{2}\alpha_{j}$ for all $b\in \mathds{N}$ and $j\geq1, j\in \mathds{N}$. 
 \end{lemma}
@@ -133,14 +131,15 @@ The source of \mysketch's estimation error is twofold: (1) the error induced by 
 %As the expected number of holes is less than $1$, we disregard their effect on the error analysis. 
 As the expected number of holes is fairly small and the holes are random, we disregard their effect on the error analysis. 
 
-First, our buffering mechanism induces a relaxation. Let $S$ be the number of NUMA nodes. Recall that each NUMA node has a Gather\&Sort object that contains two buffers of size $2k$. In addition, each of the $N$ update threads has a local buffer. When the G\&SBuffer is full, the local buffer of the owner is empty so at most $N-S$ threads lcally buffered elements. Therefore, the buffering relaxation $r$ is $4kS+(N-S)b$.
+First, our buffering mechanism induces a relaxation. Let $S$ be the number of NUMA nodes. Recall that each NUMA node has a Gather\&Sort object that contains two buffers of size $2k$. In addition, each of the $N$ update threads has a local buffer. When the G\&SBuffer is full, the local buffer of the owner is empty so at most $N-S$ threads might have locally buffered elements. Therefore, the buffering relaxation $r$ is $4kS+(N-S)b$.
 
 
-Rinberg et al.~\cite{Rinberg_2020_fast_sketches} show that for a query of a $\phi$-quantile, an $r$-relaxation of a Quantiles sketch with parameters $\epsilon_c$ and $\delta_c$, returns an element whose rank is in the range $[(\phi-\epsilon_r)n,(\phi+\epsilon_r)n]$ with probability at least $1-\delta_c$, for $\epsilon_r=\epsilon_c+\frac{r}{n}(1-\epsilon_c)$.
-
+Rinberg et al.~\cite{Rinberg_2020_fast_sketches} show that for a query of a $\phi$-quantile, an $r$-relaxation of a Quantiles sketch with parameters $\epsilon_c$ and $\delta_c$, returns an element, $x$, such that
+\[ rank(x) \in [(\phi-\epsilon_r)n,(\phi+\epsilon_r)n] \]
+with probability at least $(1-\delta_c)$, for $\epsilon_r=\epsilon_c+\frac{r}{n}(1-\epsilon_c)$.
 
 On top of this relaxation, our cache mechanism induces further staleness. Here, the staleness depends on $\rho$. Let $n_{old}$ be the stream size of the cached snapshot, and let $n_{new}$ be the current stream size. If $n_{new} / n_{old} \leq \rho$ then the query is answered from the cached snapshot.
-Denote $\rho \triangleq 1+\epsilon'$ for some $\epsilon' \geq 0 $. The element returned by the cached snapshot is in the range:
+Denote $\rho \triangleq 1+\epsilon'$ for some $\epsilon' \geq 0 $. The rank of the element returned by the cached snapshot is in the range:
 % \abovedisplayskip=5pt
 % \abovedisplayshortskip=0pt
 % \belowdisplayskip=5pt
@@ -148,11 +147,11 @@ Denote $\rho \triangleq 1+\epsilon'$ for some $\epsilon' \geq 0 $. The element r
 \begin{equation}
 \left[\left(\phi-\epsilon_r\right)n_{old},\left(\phi+\epsilon_r\right)n_{old}\right]
 \end{equation}
-As $n_{old} \leq n_{new}$, then, 
+As $n_{old} \leq n_{new}$ and $\epsilon' \geq 0 $ then, 
 \begin{align}
 \left(\phi+\epsilon_r\right)n_{old} \leq \left(\phi+\epsilon_r\right)n_{new} \leq \left(\phi+\left(\epsilon'+\epsilon_r\right)\right)n_{new} &&
 \end{align}
-On the other hand, 
+On the other hand, as $n_{old} \geq \frac{n_{new}}{\rho}$,
 \begin{align}
 \left(\phi-\epsilon_r\right)n_{old} \geq &\left(\phi-\epsilon_r\right)\frac{n_{new}}{\rho}= &&\text{($\rho = 1+\epsilon'$)} \\
 &\left(\frac{\phi}{1+\epsilon'}-\frac{\epsilon_r}{1+\epsilon'}\right)n_{new}= && \\
