@@ -13,7 +13,7 @@ Finally, Section~\ref{sec:compare} compares \mysketch\ to the state-of-the-art.
 \section{Setup and Methodology}
 \label{sec:setup}
 %============================================================
-We implement \mysketch in C++. Our memory management system is based on IBR~\cite{Haosen_2018_IBR}, an interval-based approach to memory reclamation for concurrent data structures. 
+We implement \mysketch in C++. Our memory management system is based on \acrshort{IBR}~\cite{Haosen_2018_IBR}, an interval-based approach to memory reclamation for concurrent data structures. 
 The experiments were run on a NUMA system with four Intel Xeon E5-4650 processors, each with 8 cores, for a total of 32 threads (with hyper-threading disabled).
 
 
@@ -120,9 +120,7 @@ In Figure~\ref{fig: update_query_compare_rho} we vary $\rho$, in a mixed update-
 \section{Accuracy}
 \label{sec:accuracy} 
 %============================================================
-To measure the estimate accuracy, we consider a query invoked in a quiescent state where no updates occur concurrently with the query. 
-Figure~\ref{fig: accuracy_stderr} shows the standard error of 1M estimations in a quiescent state.
-%(with no concurrent updates). If the stream distribution does not change over time, this reflects the steady state estimation. While in theory, in order for \mysketch with $b=16$ and $N>1$ threads to provide the same error guarantee as the sequential Quantiles sketch with $k_{seq}$, we need to instantiate the sketch with the $k$ parameter larger by an order of magnitude. Figure~\ref{fig: accuracy_stderr} shows that in practice, in a quiescent state, \mysketch's estimations are similar to the sequential ones using the same $k$. 
+To measure the estimate accuracy, we consider a query invoked in a quiescent state where no updates occur concurrently with the query. Figure~\ref{fig: accuracy_stderr} shows the standard error of 1M estimations in a quiescent state.%(with no concurrent updates). If the stream distribution does not change over time, this reflects the steady state estimation. While in theory, in order for \mysketch with $b=16$ and $N>1$ threads to provide the same error guarantee as the sequential Quantiles sketch with $k_{seq}$, we need to instantiate the sketch with the $k$ parameter larger by an order of magnitude. Figure~\ref{fig: accuracy_stderr} shows that in practice, in a quiescent state, \mysketch's estimations are similar to the sequential ones using the same $k$. 
 We see that \mysketch's estimations are similar to the sequential ones using the same $k$, and improves with larger values of $k$ as known from the literature on sequential sketches~\cite{mergeables_summaries}.
 \begin{figure}[h!]
     \centering

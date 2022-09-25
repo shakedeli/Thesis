@@ -23,7 +23,7 @@
 
 \def\filename{iitthesis}
 \def\fileversion{v0.10}
-\def\filedate{2022/01/14}
+\def\filedate{2022/09/20}
 \NeedsTeXFormat{LaTeX2e}
 \edef\iitthesis@TechnionIITThesis{%
 \filedate\space\fileversion\space - Technion IIT Thesis}
@@ -167,7 +167,7 @@
 % document author has loaded whatever it is they intend to use
 
 \RequirePackage{polyglossia}
-\setmainlanguage{english} % Palestine was under British rule after all
+\setmainlanguage{english} 
 \IfFileExists{bidi.sty}{}{\ClassError{\filename}{The bidi package is not available for loading}{}}
 \AtEndPreamble{
  \setotherlanguage[numerals=arabic,calendar=gregorian]{hebrew}
@@ -220,7 +220,7 @@
 % But this does (coupled with a condition invocation of \glsaddallunused 
 % in \makebackmatter):
 % \ifbool{iitthesis-abbrevs}{
-   \booltrue{iitthesis-keep-unused-abbrevs}
+  \booltrue{iitthesis-keep-unused-abbrevs}
 % }{}
 }
 
@@ -490,7 +490,7 @@
     % (although we have no pages left...)
 
  \ifbool{iitthesis-keep-unused-abbrevs}{
-   \glsaddallunused
+  \glsaddallunused
  }{}
 }
 

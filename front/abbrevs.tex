@@ -12,7 +12,7 @@
 % abbreviations; see the documentation for the glossaries-extras package at:
 % https://ctan.org/pkg/glossaries-extra
 %
-%\setabbreviationstyle[acronym]{long-short-sc}
+% \setabbreviationstyle[acronym]{long-short-sc}
 %
 % If you're wondering why we're setting the seemingly-redundant "notation 
 % category", that's a hack discussed here:
@@ -70,6 +70,7 @@
 %     Atoning for being educable through delicate beauty;
 %     Something to say when you have nothing to say.}
 
+
 \newacronym[%
   category=notation-category,%
   description=]%
@@ -97,52 +98,70 @@
   description=]%
   {FA}{F\&A}{Fetch-And-Add}
   
-  \newacronym[%
-  category=notation-category,%
-  description= $A$ is a PAC learning algorithm if for given $\epsilon>0$ and $\delta<1$ $A$ outputs a hypothesis $h$ that has an average error less than or equal to $\epsilon$ on the samples with probability at least $1-\delta$]%
-  {PAC Learning}{PAC Learning}{Probably Approximately Correct Learning}
+%   \newacronym[%
+%   category=notation-category,%
+%   description= $A$ is a PAC learning algorithm if for given $\epsilon>0$ and $\delta<1$ $A$ outputs a hypothesis $h$ that has an average error less than or equal to $\epsilon$ on the samples with probability at least $1-\delta$]%
+%   {PAC Learning}{PAC Learning}{Probably Approximately Correct Learning}
 
-  \newacronym[%
+\newacronym[%
+category=notation-category,%
+description= $A$ is a PAC learning algorithm if for given $\epsilon>0$ and $\delta<1$ $A$ outputs a hypothesis $h$ that has an average error less than or equal to $\epsilon$ on the samples with probability at least $1-\delta$]%
+  {PAC}{PAC}{Probably Approximately Correct}
+
+\newacronym[%
   category=notation-category,%
   description= A PAC Quantiles sketch with parameters $\epsilon$ and $\delta$ return an element $x$ for query($\phi$) after $n$ updates such that $R(A{\textit{,}}x) \in {[}(\phi-\epsilon)n{\textit{,}}(\phi+\epsilon)n{]}$ with probability at least $1-\delta$]%
   {PACQS}{PAC Quantiles Sketch}{Probably Approximately Correct Quantiles Sketch}
 
 
-  \newacronym[%
+\newacronym[%
   category=notation-category,%
   description= framework proposed by Rinberg et al.~\cite{Rinberg_2020_fast_sketches} for building concurrent data sketches]%
   {FCDS}{FCDS}{Fast Concurrent Data Sketches}
 
-
-  \newacronym[%
+\newglossaryentry{epsilon}{%
+  type=notation,%
   category=notation-category,%
-  description=]%
-  {epsilon}{$\epsilon$}{Bound on the estimation error}
+  name=$\epsilon$,%
+  description=Bound on the estimation error%
+}
+
   
-  \newacronym[%
+\newglossaryentry{delta}{%
+  type=notation,%
   category=notation-category,%
-  description=]%
-  {delta}{$\delta$}{Bound on the failure probability}
+  name=$\delta$,%
+  description=Bound on the failure probability%
+}
 
-  \newacronym[%
-  category=notation-category,%
-  description=]%
-  {N}{$N$}{Number of update threads}
   
-\newacronym[%
+\newglossaryentry{N}{%
+  type=notation,%
   category=notation-category,%
-  description=]%
-  {b}{$b$}{Size of threads' local buffer}
+  name=$N$,%
+  description=Number of update threads%
+}
+  
+\newglossaryentry{b}{
+    type=notation,
+    category=notation-category,
+    name=$b$,
+    description=Size of threads' local buffer
+  }
 
-  \newacronym[%
-  category=notation-category,%
-  description=]%
-  {S}{$S$}{Number of NUMA nodes}
+\newglossaryentry{S}{
+    type=notation,
+    category=notation-category,%
+    name=$S$,
+    description=Number of NUMA nodes%
+}
 
-  \newacronym[%
+\newglossaryentry{k}{%
+    type=notation,
   category=notation-category,%
-  description=]%
-  {k}{$k$}{The sketch summary size}
+  name=$k$,
+  description=The sketch summary size%
+}
   
 
   \newacronym[%
@@ -155,25 +174,32 @@
   description=]%
   {cdf}{CDF}{Cumulative Distribution Function}
 
-  \newacronym[%
-  category=notation-category,%
-  description=]%
-  {holes}{Holes}{Occurrences where thread-local buffered elements are sporadically overwritten by others without being propagated${\textit{,}}$ and others are duplicated${\textit{,}}$ i${.}$e${.}{\textit{,}}$ propagated more than once }
+\newglossaryentry{holes}{
+    type=notation,
+    category=notation-category,%
+    name=Holes,
+  description=Occurrences where thread-local buffered elements are sporadically overwritten by others without being propagated${\textit{,}}$ and others are duplicated${\textit{,}}$ i${.}$e${.}{\textit{,}}$ propagated more than once }
   
-\newacronym[%
-  category=notation-category,%
-  description= as long as this threshold does not exceed$\textit{,}$ the query is answered from the cached snapshot]%
-  {rho}{$\rho$}{Threshold for rebuilding a snapshot}
+\newglossaryentry{rho}{
+    type=notation,
+    category=notation-category,%
+    name=$\rho$,
+  description= Threshold for rebuilding a snapshot
+ }
   
-      \newacronym[%
-  category=notation-category,%
-  description=]%
-  {MAXLEVEL}{$\mathrm{MAX\_LEVEL}$}{Maximum number of levels in the sketch}
+\newglossaryentry{MAXLEVEL}{
+    type=notation,
+    category=notation-category,%
+    name={$\mathit{MAX\_LEVEL}$},
+    description=Maximum number of levels in the sketch
+}
 
-    \newacronym[%
-  category=notation-category,%
-  description= given a stream $A$ with $n$ elements the rank of some $x$ (not necessarily in $A$) is the number of elements smaller than $x$ in $A$]%
-  {Rank}{$\mathrm{Rank(A\textit{, }x)}$}{Rank of an element $x$ in $A$}
+\newglossaryentry{Rank}{
+    type=notation,
+    category=notation-category,%
+    name={${R(A,x)}$},
+    description={Given a stream $A$ with $n$ elements the rank of some $x$ (not necessarily in $A$) is the number of elements smaller than $x$ in $A$}
+}
   
       \newacronym[%
   category=notation-category,%
@@ -196,4 +222,4 @@
 % Uncomment this command to have _all_ abbreviations and acronyms defined
 % in this file appear in the final list - rather than just the ones you
 % use in the thesis
-\keepUnusedAbbreviations
+% \keepUnusedAbbreviations

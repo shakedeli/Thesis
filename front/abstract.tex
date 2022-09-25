@@ -17,8 +17,18 @@
 %   present in the English; it is not just a translation.
 
 \abstractEnglish{
+Real-time analytics of large data streams is a fundamental task in the world of big data. When analyzing massive datasets, generating exact answers to even very basic queries about the data can require huge compute resources (memory and compute time). This leads to failure to scale as working with the full data is computationally infeasible.  
 
-Sketches are a family of streaming algorithms widely used in the world of big data to perform fast, real-time analytics. A popular sketch type is Quantiles, which estimates the data distribution of a large input stream. We present Quancurrent, a highly scalable concurrent Quantiles sketch. Quancurrent’s throughput increases linearly with the number of available threads, and with $32$ threads, it reaches an update speedup of $12$x and a query speedup of $30$x over a sequential sketch. Quancurrent allows queries to occur concurrently with updates and achieves an order of magnitude better query freshness than existing scalable solutions.
+Sketches are statistical data summaries of large data streams used to perform fast real-time analytics using only a small amount of memory space. They are a family of streaming algorithms, processing massive datasets in a single pass and can provide accurate, though approximate, answers to queries with mathematical error bounds to computationally complex queries orders of magnitude faster than traditional, exact methods.  
+
+Understanding the data distribution of a large stream of numeric values, such as web-page load times, is a fundamental task within the constraints of single-pass computation (the streaming model). We often desire to characterize the distribution of these values to understand the impact on users, for example, the median, fifth, and 95th percentile values. These are called quantiles. Quantiles are widely used representations for data distribution. The quantiles correspond to the cumulative distribution function (CDF), which yields the probability density function (PDF).
+
+A popular sketch type is Quantiles, which estimates the data distribution of a large input stream. Quantiles sketch estimates a quantile query up to an additive error with bounded failure probability. 
+
+We present Quancurrent, a highly scalable concurrent Quantiles sketch that retains a small error bound with reasonable query freshness. Quancurrent's throughput increases linearly with the number of available threads, and with 32 threads, it reaches an update speedup of 12x and a query speedup of 30x over a sequential Quantiles sketch. Quancurrent allows queries to occur concurrently with updates and achieves an order-of-magnitude better query freshness than existing scalable solutions. 
+
+We prove our algorithm's correctness and analyze the approximation error and the query freshness. 
+  
 
 % So this should contain a few more paragraphs... we'll fill them using some placeholder text (in Latin):
 
@@ -28,26 +38,6 @@ Sketches are a family of streaming algorithms widely used in the world of big da
 
 
 \abstractHebrew{
-
-% Note that certain commands don't work that well in Hebrew "mode".
-% If this happens to you, try wrapping the command within a
-% \textenglish{ } - that may (or may not) help.
-
-% כאן יבוא תקציר מורחב בעברית (כאשר שפת החיבור העיקרית היא אנגלית). היקף התקציר יהיה \textenglish{1000-2000} מילים. התקציר יהווה שלמות בפני עצמו ויהיה מובן לקורא בעל ידיעות כלליות בנושא.
-
-% בית הספר ללימודי מוסמכים מנחה מספר הנחיות לגבי התקציר בעברית:
-% \begin{itemize}
-% \item על התקציר להיכתב במשפטים מקושרים שלמים.
-% \item בדרך-כלל אין לציין בתקציר מקורות ספרותיים וציטוטים.
-% \item אין להתייחס למספר של פרק, סעיף, נוסחה, ציור או טבלה שבגוף החיבור, ואין להשתמש בקיצורים, סמלים ומונחים לא מקובלים, אלא אם יש בתקציר די מקום לזיהויים.
-% \end{itemize}
-
-% לעתים יש בכל-זאת יש צורך לכלול פקודה הכוללת קישור פנימי או חיצוני בתוך התקציר העברי; במצבים כאלו כדאי דרך-כלל לעטוף את הפקודה היוצרת את הקישור בתוך פקודת \textenglish{\texttt{\textbackslash{}textenglish\{\}}} כדי למנוע כל מיני פורענויות בלתי-רצויות, כגון כישלון בהידור קובץ ה-\textenglish{PDF} או שימוש בגופן העברי באופן אשר עלול שלא להנעים לעין. לדוגמה: נניח שיש לנו צורך לצטט מקור ביבליוגרפי. אם נעשה זאת סתם-כך: \textenglish{\texttt{\textbackslash{}cite\{Hoeffding\}}}, נקבל: \cite{Hoeffding}; אם נעטוף את פקודת הציטוט, כך: \textenglish{\texttt{\textbackslash{}textenglish\{\textbackslash{}cite\{Hoeffding\}\}}}, נקבל \textenglish{\cite{Hoeffding}} (כפי שהציטוטים נראים גם בטקסט באנגלית).
-
-% \subsection*{\texthebrew{תת-חלק בתקציר המורחב}}
-
-% תוכן מקוצר לגבי נושא מסוים. התייחסות ל\emph{מושג} מסוים שהחיבור בוחן. וכולי וכולי.
-
 אנאליזה בזמן אמת של זרם נתונים גדול הינה משימה הכרחית בעולם האנאליטיקות של ביג דאטה (נתוני עתק). מערכות מודרניות מטפלות כל הזמן בכמויות עצומות של מידע המגיע בקצב גבוה תוך כדי שהן מספקות ניתוחי זמן אמת עם זמני עיכוב מינימאליים. שרתי אינטרנט מתמודדים עם פטות של בתים ועליהם להיות תמיד זמינים, אינטראקטיביים ומהירים. 
 
 בעת ניתוח מידע בקנה מידע מאסיבי, חישוב מדויק, אפילו של שאילתות בסיסיות מאוד, עשוי לדרוש משאבי מחשוב עצומים (זיכרון וזמן חישוב). זה מוביל לפגיעה ביכולתה של מערכת להתמודד עם עומסים הולכים וגדלים. דוגמאות לשאילתות שניתן לשאול על המידע שנאסף כוללות שאילתת ספירת ערכים ייחודים, חישוב שברונים ואחוזונים, זיהוי תדר תכיפות ועוד. השיטות המדויקות לחישוב שאילתות אלה לא מצליחות להתאים את עצמן לכמויות המידע הממשיכות כל הזמן לגדול. כלים המסייעים לזהות מגמות או דפוסים מרכזיים של המידע מתוך נפח גדול של נתונים גולמיים הם בעלי ערך רב. 
@@ -65,5 +55,5 @@ Sketches are a family of streaming algorithms widely used in the world of big da
 
 הארכיטקטורה של הסקיצה המקבילית מבוססת על חציצה מקומית של ערכים, אשר מפועפעים לאחר מכן באצווה לסקיצה משותפת. הסקיצה מביאה לביטול צוואר הבקבוק שנובע בעיקר מהצורך במיון חוצצים גדולים. המיון בסקיצה המקבילית מתבצע בשלוש רמות והסקיצה המשותפת עצמה מאורגנת במספר רמות אשר עשויות להיות מופצות וממוינות במקביל. שאילתות מטופלות כל הזמן במקביל לפעולות עדכון. כדי לאפשר סקילביליות של שאילתות, הסקיצה משרתת אותן מתמונת מצב של הסקיצה המשותפת השמורה במטמון מקומי תוך שמירה על רעננות התוצאות. 
 
-בעבודה זו אני מגדירים רשמית את מודל המערכת ומביאים הוכחה פורמאלית לנכונות הסקיצה המקבילית. 
+בעבודה זו אני מגדירים רשמית את מודל המערכת ומביאים הוכחה פורמאלית לנכונות הסקיצה המקבילית.
 } % end of Hebrew abstract

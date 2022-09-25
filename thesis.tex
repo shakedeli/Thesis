@@ -92,10 +92,7 @@
 \include{main/analysis}
 \include{main/evaluation}
 \include{main/correctness}
-
-% \include{main/prelims}
-% \include{main/mainchap1}
-% \include{main/conclusion}
+\include{main/conclusion}
 %
 % Add any appendices here; they must come _before_ the bibliography
 %
@@ -122,10 +119,12 @@
 % Hebrew cover page will be the last page of the file.
 %
 \makebackmatter
-
 % The resulting PDF can be printed and taken straight to binding,
 % i.e. you do not need to flip any pages anywhere. Of course,
 % mind the LaTeX error and warning messages, overfull hboxes etc.
+% \AtEndDocument{\glsaddallunused}
+
+% \glsaddallunused
 
 \end{document}
 
