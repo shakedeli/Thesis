@@ -33,20 +33,21 @@ We measured \mysketch's throughput in three workloads:
     % \hspace{-3em}
     \begin{subfigure}[]{0.49\textwidth}
         \centering
-        \includegraphics[width=\textwidth,trim={0cm 0cm 1.9cm 2.6cm},clip] {graphics/graphs/throughput/oracle_Quancurrent_blocking_numa_update_k4096_b16_keys10M_Tup32_runs15_16-08-2022_05-29-07.pdf}
+        \includegraphics[width=\textwidth,trim={0cm 7cm 1.9cm 10cm},clip] {graphics/graphs/throughput/oracle_Quancurrent_blocking_numa_update_k4096_b16_keys10M_Tup32_runs15_16-08-2022_05-29-07_flat.pdf}
         \caption{Update-only, $10M$ elements.}
         \label{fig:update_only_speedup}
     \end{subfigure}
     % \hspace{-5em}
     \begin{subfigure}[]{0.49\textwidth}
         \centering
-        \includegraphics[width=\textwidth,trim={0cm 0cm 1.9cm 2.6cm},clip] {graphics/graphs/throughput/oracle_Quancurrent_blocking_numa_query_k4096_b16_keys10M_Tup32_runs15_prefill10M_prefillT1_16-08-2022_05-38-28.pdf}
+        \includegraphics[width=\textwidth,trim={0cm 7cm 1.9cm 9cm},clip] {graphics/graphs/throughput/oracle_Quancurrent_blocking_numa_query_k4096_b16_keys10M_Tup32_runs15_prefill10M_prefillT1_16-08-2022_05-38-28_flat.pdf}
         \caption{Query-only, $10M$ elements prefilled, $10M$ queries.}
         \label{fig:query_only_throughput}
     \end{subfigure}
 
     \begin{subfigure}[]{\textwidth}
         \centering
+        \hspace{5pt}
         \includegraphics[width=\textwidth,trim={0cm 0cm 0cm 1cm},clip]
         {graphics/graphs/throughput/oracle_Quancurrent_blocking_numa_update_query_k_4096_b16_keys10M_pre10M_preT1_runs15_Tu1-2_Tq2-30_snapshot1_rho_1_0-05_united_16-08-2022_07-09-08.pdf}
         \caption{One or two update threads, up to $32$ query threads, $10M$ elements inserted after a pre-fill of $10M$ elements.}
@@ -93,14 +94,14 @@ In Figure~\ref{fig: update_query_compare_rho} we vary $\rho$, in a mixed update-
     \centering
     \begin{subfigure}{\textwidth}
     \centering
-    \includegraphics[width=0.7\textwidth,trim={0 0cm 0cm 0.7cm},clip]{graphics/graphs/parameters/oracle_Quancurrent_blocking_numa_compare_k_b16_keys10M_Tup32_runs15_04-07-2022_12-26-29.pdf}
+    \includegraphics[width=0.7\textwidth,trim={0cm 7cm 1cm 10cm},clip]{graphics/graphs/parameters/oracle_Quancurrent_blocking_numa_compare_k_b16_keys10M_Tup32_runs15_04-07-2022_12-26-29_flat.pdf}
     \caption{Update-only, \#keys = $10M$, $b=16$.}
     \label{fig: throughput_update_compare_k}
     \end{subfigure}
 \vfill
     \begin{subfigure}{\textwidth}
     \centering
-    \includegraphics[width=0.7\textwidth,trim={0 0cm 0cm 0.7cm},clip]{graphics/graphs/parameters/oracle_Quancurrent_blocking_numa_compare_b_k4096_keys10M_Tup32_runs15_11-08-2022_20-12-56.pdf}
+    \includegraphics[width=0.7\textwidth,trim={0cm 7cm 1cm 10cm},clip]{graphics/graphs/parameters/oracle_Quancurrent_blocking_numa_compare_b_k4096_keys10M_Tup32_runs15_11-08-2022_20-12-56_flat.pdf}
     \caption{Update-only, \#keys = $10M$, $k=4096$.}
     \label{fig: throughput_update_compare_b}
     \end{subfigure}
@@ -149,7 +150,7 @@ To illustrate the impact of $k$ visually, Figure~\ref{fig:cdf} compares the dist
         \caption{Normal distribution.} \label{fig:cdf_normal}
     \end{subfigure}
 
-\caption{\mysketch's $\phi$-quantiles vs. exact CDF, with $32$ threads, $b=16$, and a stream size of $10M$.} \label{fig:cdf}
+\caption{\mysketch's $\phi$-quantiles vs. exact quantiles, with $32$ threads, $b=16$, and a stream size of $10M$.} \label{fig:cdf}
 \end{figure}
 
 %============================================================

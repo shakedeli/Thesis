@@ -1,5 +1,5 @@
-\chapter{Preliminaries}
-\label{chap:prelims}
+% \chapter{Preliminaries}
+% \label{chap:prelims}
 
 We consider a shared memory model, where a finite number of threads execute \emph{operations} on shared \emph{objects}. An operation consists of an \emph{invocation} and a matching \emph{response}. A \emph{history} \(\mathnormal{H}\) is a finite sequence of operation invocation and response steps. A history \(\mathnormal{H}\) defines a partial order \(\prec_\mathnormal{H}\) on operations: Given operations \(op\) and \(op'\), \(op \prec_H op'\) if and only if \(response(op)\) precedes \(invocation(op')\) in \(\mathnormal{H}\). Two operations that do not precede each other are \emph{concurrent}. In a \emph{sequential history}, there are no concurrent operations. An object is specified using a \emph{sequential specification} $\mathcal{H}$, which is the set of its allowed sequential histories.
 An operation \emph{op} is \emph{complete} in a history \(\mathnormal{H}\) if both \(invocation(op)\) and its matching \(response(op)\) are in \(\mathnormal{H}\).
@@ -11,9 +11,9 @@ A function \(f\) mapping executions to histories is \emph{prefix-preserving} if 
 An object A is \emph{strongly linearizable} if there is a prefix-preserving function \(f\) that maps every history \(\mathnormal{H}\) of $A$ to a linearization of \(\mathnormal{H}\).
 \end{definition}
 
-Our algorithm is randomised and we consider a weak adversary that determines the scheduling without observing the coin-flips.
+Our algorithm is randomized and we consider a \emph{weak adversary} that determines the scheduling without observing the coin-flips.
 
-As previously mentioned, we adopt a flavor of \emph{relaxed semantics}, as defined in \cite{Henzinger_2013_Quantitative_Relaxation}:
+We adopt a flavor of \emph{relaxed semantics}, as defined in \cite{Henzinger_2013_Quantitative_Relaxation}:
 
 \begin{definition}[$r$-relaxation] \label{def:r-relaxtion}
 A sequential history $H$ is an \emph{$r$-relaxation} of a sequential history H', if H is comprised of all but at most $r$ of the invocations in $H'$ and their responses,
