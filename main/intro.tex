@@ -1,7 +1,7 @@
 \chapter{Introduction}
 \label{chap:intro}
 
-Data sketches, or \emph{sketches} for short, are indispensable tools for performing analytics on high-rate, high-volume data~\cite{KDD_tutorial}. A case study made by Yahoo~\cite{flurry_case} has shown the impact of sketches on data analytics. Flurry~\cite{flurry} is a mobile application real-time analytics platform, acquired by Yahoo in 2014. The use of data sketches architecture in Flurry reduced the overall cost of the system considerably. Sketches led to a reduction in data processing times from days or hours to minutes or seconds.
+Data sketches, or \emph{sketches} for short, are indispensable tools for performing analytics on high-rate, high-volume data~\cite{KDD_tutorial}. A case study made by Yahoo has shown the impact of sketches on data analytics. Flurry~\cite{flurry} is a mobile application real-time analytics platform, acquired by Yahoo in 2014. The use of data sketches architecture in Flurry reduced the overall cost of the system considerably. Sketches led to a reduction in data processing times from days or hours to minutes or seconds~\cite{flurry_case}.
 
 Specifically, understanding the data distribution is a fundamental task in data management and analysis, used in applications such as exploratory data analysis~\cite{vartak2015seedb}, operation monitoring~\cite{abraham2013scuba}, and more. The Quantiles sketch family captures this task~\cite{masson2019ddsketch, mergeables_summaries, gan2018moment, cormode2021relative}. The sketch represents the quantiles distribution in a stream of $n$ elements, such that for any $0 \leq \phi \leq 1$, a query for quantile $\phi$ returns an estimate of the $\lfloor n\phi \rfloor ^{\text{th}}$ largest element. For example, quantile $\phi=0.5$ is the median.
 
