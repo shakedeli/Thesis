@@ -2,7 +2,7 @@
 \label{chap:correctness}
 
 
-In this section we prove \mysketch's correctness. 
+In this section, we prove \mysketch's correctness. 
 
 \section{Preliminaries}
 
@@ -11,7 +11,7 @@ Queries are answered from an array of ordered tuples summarizing the total strea
 As described in Section~\ref{sec:update_alg}, the update operation is divided into 3 stages: 
 (1) $\mathit{gather\ and\ sort}$ is the process of ingesting stream elements into a $\mathit{Gather\&Sort}$ unit.
 (2) $\mathit{batch\ update}$ is the process of copying $2k$ elements from one of the \emph{G\&SBuffer}s into \mysketch's first level. 
-(3) $\mathit{propagate\ levels}$ is the process of merging base level up the sketch's levels until reaching an empty level. 
+(3) $\mathit{propagate\ levels}$ is the process of merging the base level up the sketch's levels until reaching an empty level. 
 
 % In the following section we list some definitions and prove the correctness of \mysketch. 
 
@@ -51,10 +51,10 @@ We denote the number of updates in history $\mathit{H}$ as $\mathit{|H|}$.
 \end{lemma}
 \begin{proof}
 \mysketch is an $r$-relaxed concurrent Quantiles sketch. 
-The correctness condition for randomized algorithms under concurrency is strong linearizability~\cite{strong_linearizability}. Strong linearizability is defined with respect to the sequential specification. Sequential specification is defined with respect to deterministic objects. Therefore, we de-randomized \mysketch by providing coin flips with every update. We denote by \emph{SeqSketch} to be the sequential specification (i.e., the set of all sequential histories) of \mysketch.
+The correctness condition for randomized algorithms under concurrency is strong linearizability~\cite{strong_linearizability}. Strong linearizability is defined with respect to the sequential specification. The sequential specification is defined with respect to deterministic objects. Therefore, we de-randomized \mysketch by providing coin flips with every update. We denote by \emph{SeqSketch} to be the sequential specification (i.e., the set of all sequential histories) of \mysketch.
 
 
-A relaxed consistency extend the sequential specification of an object to a larger set that contains sequential histories which are not legal but are at bounded "distance" from a legal sequential history~\cite{Henzinger_2013_Quantitative_Relaxation,Afek_2010_Quasi_linearizability,Rinberg_2020_fast_sketches}. We re-define \mysketch sequential specification by relaxing it. Intuitively, we allow a query to "miss" a bounded number of updates that precede it. Quantiles sketch is order agnostic, thus re-ordering updates is also allowed. We denote by $SeqSketch^r$ the set of "relaxed" sequential histories.
+A relaxed consistency extends the sequential specification of an object to a larger set that contains sequential histories which are not legal but are at bounded "distance" from a legal sequential history~\cite{Henzinger_2013_Quantitative_Relaxation, Afek_2010_Quasi_linearizability, Rinberg_2020_fast_sketches}. We re-define \mysketch sequential specification by relaxing it. Intuitively, we allow a query to "miss" a bounded number of updates that precede it. Quantiles sketch is order agnostic, thus re-ordering updates is also allowed. We denote by $SeqSketch^r$ the set of "relaxed" sequential histories.
 
 Let $\sigma$ be a concurrent execution of \mysketch. We use two mappings, from concurrent executions to sequential histories, defined as follows.
 First, we define a mapping, $l$, from a concurrent execution to a serialization, by ordering operations according to the following linearization points:
@@ -63,7 +63,7 @@ First, we define a mapping, $l$, from a concurrent execution to a serialization,
 \item \textbf{Update} linearization point is the insertion of elements to threads' local buffers (Algorithm \ref{alg:gather}, Line \ref{Line: update_linearization}).
 \end{itemize}
 
-Strong linearizability requires that the linearization of a prefix of a concurrent execution is a prefix of the linearization of the whole execution. By definition, $l(\sigma)$ is prefix-preserving. Note that $l(\sigma)$ is a serialization that does not necessarily meets the sequential specification.
+Strong linearizability requires that the linearization of a prefix of a concurrent execution is a prefix of the linearization of the whole execution. By definition, $l(\sigma)$ is prefix-preserving. Note that $l(\sigma)$ is a serialization that does not necessarily meet the sequential specification.
 
 Relaxed consistency extends the sequential specification of an object to include also relaxed histories.
 We define a second mapping, $f$, from a concurrent execution to a serialization, by ordering operations according to visibility points:
@@ -110,24 +110,24 @@ The variable tritmap is altered only in Line~\ref{Line:insert_batch} of Algorith
 % \end{itemize}
 % \end{invariant}
 % \begin{proof}
-% By definition, \emph{tritmap} is initialized to 0 and updated only at \emph{insertBase} and \emph{mergeLevel} procedures. On each propagation, we copy current G\&SBuffer array to level 0 by calling \emph{insertBase}, increase \emph{tritmap} by 2 and start propagateLevels. At the beginning of each propagation, we first merge the base level of \(\mathnormal{S}\) into the next level and increase \emph{tritmap} by 1. After each \emph{insertBase}, \(tritmap[0] = 2\) and \(levels[0]\) contains \(2k\) points. After each merge of base level, \(tritmap[0] = 0\) and \(levels[0]\) is not contained in the sketch's samples array. On each \emph{propagation}, the following \emph{mergeLevel} calls (after the merge of base level) increase \emph{tritmap} by $3^i$ for $i>0$ and therefore \(tritmap[0] = 0\) until the end of \emph{propagation}. 
+% By definition, \emph{tritmap} is initialized to 0 and updated only at \emph{insertBase} and \emph{mergeLevel} procedures. On each propagation, we copy the current G\&SBuffer array to level 0 by calling \emph{insertBase}, increase \emph{tritmap} by 2, and start propagateLevels. At the beginning of each propagation, we first merge the base level of \(\mathnormal{S}\) into the next level and increase \emph{tritmap} by 1. After each \emph{insertBase}, \(tritmap[0] = 2\) and \(levels[0]\) contains \(2k\) points. After each merge of the base level, \(tritmap[0] = 0\) and \(levels[0]\) are not contained in the sketch's samples array. On each \emph{propagation}, the following \emph{mergeLevel} calls (after the merge of base level) increase \emph{tritmap} by $3^i$ for $i>0$ and therefore \(tritmap[0] = 0\) until the end of \emph{propagation}. 
 % \end{proof}
 
 
 \begin{invariant} \label{Inv: tritmap_sketch_state}
 The variable tritmap represents the sketch state:
 \begin{itemize}
-    \item If \(tritmap[i] = 0\), then \(levels[i]\) is empty or does not contained in the sketch's samples array (needs to be ignored).
+    \item If \(tritmap[i] = 0\), then \(levels[i]\) is empty or is not contained in the sketch's samples array (needs to be ignored).
     \item If \(tritmap[i] = 1\), then \(levels[i]\) contains \(k\) points associated with a weight of \(2^i\).
     \item If \(tritmap[i] = 2\), then \(levels[i]\) contains \(2k\) points associated with a weight of \(2^i\).
 \end{itemize}
 \end{invariant}
 \begin{proof}
-The proof is by induction on the length of levels array (or its current maximum depth).\\
+The proof is by induction on the length of the levels array (or its current maximum depth).\\
 \underline{Base}: By definition, tritmap is initialized with 0 and updated during the batchUpdate procedure and the propagate procedure.
 After the first batch update, level 0 contains $2k$ elements and tritmap is increased by 2 such that tritmap[0]=2. When this first batch is merged with the next level, level 1 contains $k$ elements and tritmap is increased by 1 such that tritmap[0]=0.
-On each propagation, we first perform a batch update of one of the G\&SBuffer arrays to level 0 and increase tritmap by 2. Then we call propagate() starting with level 0. Level 0 is merged with the next level and tritmap is incremented by 1. Therefore, after each batchUpdate, \(tritmap[0] = 2\) and level 0 contains \(2k\) elements and after each call to propagate(0) \(tritmap[0] = 0\) and level 0 is not contained in the sketch's samples array. The following calls to propagate increase tritmap by $3^i$ for $i>0$ and \(tritmap[0] = 0\) until the end of the current propagation. \\
-\underline{Inductive hypothesis}: We assume the invariant holds for all levels i such that \(i>0\) and prove it holds for level \(i+1\). By definition, tritmap is updated during batchUpdate and propagate procedures. For \(i>0\), \(tritmap\) is changed only if \(tritmap[i]=2\). By the inductive hypothesis, if \(tritmap[i] = 2\), then \(levels[i]\) contains \(2k\) points associated with a weight of \(2^i\). If propagation has not yet reached level i+1, it is empty and \(tritmap[i+1]=0\) (by initialization). After a call to propagate(i), \(levels[i+1]\) contains k points associated with a weight of \(2^{i+1}\) and tritmap satisfies \([b_{31},\dots,b_{i+2},0,2,b_{i-1},\dots,b_0] + 3^i = [b_{31},\dots,b_{i+2},1,0,b_{i-1},\dots,b_0]\) i.e \(tritmap[i+1]=1\). After the next call to propagate(i), level i+1 will contain \(2k\) points associated with a weight of \(2^{i+1}\) and tritmap will satisfy \([b_{31},\dots,b_{i+2},1,2,b_{i-1},\dots,b_0] + 3^i = [b_{31},\dots,b_{i+2},2,0,b_{i-1},\dots,b_0]\) i.e \(tritmap[i+1]=2\). Note that each propagation starts from level 0 and stops when reaching an empty level $j$, the tritmap trit larger then $j$ are not changed.
+On each propagation, we first perform a batch update of one of the G\&SBuffer arrays to level 0 and increase the tritmap by 2. Then we call propagate() starting with level 0. Level 0 is merged with the next level and the tritmap is incremented by 1. Therefore, after each batchUpdate, \(tritmap[0] = 2\) and level 0 contains \(2k\) elements and after each call to propagate(0) \(tritmap[0] = 0\) and level 0 is not contained in the sketch's samples array. The following calls to propagate increase tritmap by $3^i$ for $i>0$ and \(tritmap[0] = 0\) until the end of the current propagation. \\
+\underline{Inductive hypothesis}: We assume the invariant holds for all levels i such that \(i>0\) and prove it holds for level \(i+1\). By definition, tritmap is updated during batchUpdate and propagate procedures. For \(i>0\), \(tritmap\) is changed only if \(tritmap[i]=2\). By the inductive hypothesis, if \(tritmap[i] = 2\), then \(levels[i]\) contains \(2k\) points associated with a weight of \(2^i\). If propagation has not yet reached level i+1, it is empty and \(tritmap[i+1]=0\) (by initialization). After a call to propagate(i), \(levels[i+1]\) contains k points associated with a weight of \(2^{i+1}\) and tritmap satisfies \([b_{31},\dots,b_{i+2},0,2,b_{i-1},\dots,b_0] + 3^i = [b_{31},\dots,b_{i+2},1,0,b_{i-1},\dots,b_0]\) i.e \(tritmap[i+1]=1\). After the next call to propagate(i), level i+1 will contain \(2k\) points associated with a weight of \(2^{i+1}\) and tritmap will satisfy \([b_{31},\dots,b_{i+2},1,2,b_{i-1},\dots,b_0] + 3^i = [b_{31},\dots,b_{i+2},2,0,b_{i-1},\dots,b_0]\) i.e \(tritmap[i+1]=2\). Note that each propagation starts from level 0 and stops when reaching an empty level $j$, the tritmap trit larger than $j$ are not changed.
 \end{proof}
 
 
@@ -140,12 +140,12 @@ The proof is by induction on the length of \(\sigma\).\\
 \underline{Inductive hypothesis}: We assume the invariant holds for \(\sigma'\), and prove it holds for \(\sigma = \{\sigma',step\}\). We consider only steps that can alter the invariant, meaning steps that can change the sketch state.
 \begin{itemize}
     \item DCAS operation during the batchUpdate procedure, increasing tritmap by 2 and copying one of the G\&SBuffer arrays into the first level of \mysketch.
-    \item[] By the inductive hypothesis, before the step, \mysketch summarises \(f(\sigma')\). If the DCAS fails, the sketch state has not changed. Else, $2k$ elements were copied to level 0 and tritmap was increased by 2. 
+    \item[] By the inductive hypothesis, before the step, \mysketch summarises \(f(\sigma')\). If the DCAS fails, the sketch state has not changed. Else, $2k$ elements were copied to level 0 and the tritmap was increased by 2. 
     From Invariant \ref{Inv: GSBuffer_summary}, a G\&SBuffer array summarises a collection of \(2k\) elements \(\{a_1,\dots,a_{2k}\}\). By copying, we sequentially ingest the stream \(B=\{a_1,\dots,a_{2k}\}\) to \mysketch. Let \(A=\mathcal{S}(f(\sigma'))\). By definition, \mysketch summarises \(A||B\). Therefore \mysketch summarises \(f(\sigma)\), preserving the invariant. 
     \item DCAS operations during the propagate procedure, updating tritmap and merging level \(i\) with its following level.
     \item[] By the inductive hypothesis, before the step, \mysketch summarises \(f(\sigma')\). If the DCAS fails, the sketch state has not changed by the step. Else, we propagated level \(i\) into level \(i+1\). By definition, \(k\) points from level \(i\) were merged with level \(i+1\), with the weight of each point scaled up by a factor 2. After the merge, tritmap[i]=0 therefore, level \(i\) was disabled from \(samples[]\) and \(2k\) points associated with a weight of \(2^i\) are not included in the summary. The total weight of the sketch's elements was not changed. The sketch summarises the same stream, no new points were added and the stream size was not changed. Thus, the sketch's state presents (summarises) the same stream, that is, \mysketch summarises \(f(\sigma)\), preserving the invariant. 
     \item Operations to clear level i, updating \(levels[i] \gets \bot\).
-    \item[] By definition, \(tritmap[i] = 0\). By Invariant \ref{Inv: tritmap_sketch_state}, \(levels[i]\) is empty or ignored and not included in \(samples[]\). Thus, operations to clear levels does not affect the stream processed by the sketch thus far. \mysketch summarises \(f(\sigma)\), preserving the invariant.
+    \item[] By definition, \(tritmap[i] = 0\). By Invariant \ref{Inv: tritmap_sketch_state}, \(levels[i]\) is empty or ignored and not included in \(samples[]\). Thus, operations to clear levels do not affect the stream processed by the sketch thus far. \mysketch summarises \(f(\sigma)\), preserving the invariant.
 \end{itemize}
 \end{proof}
 
@@ -161,7 +161,7 @@ By definition, the visibility point of a query is when the second tritmap read r
 Therefore, The query $\mathnormal{Q}$ returns a value equal to the value returned by a sequential Quantiles sketch after processing the stream \(A=\mathcal{S}(f(\sigma'))\).
 \end{proof}
 
-We have shown that each query in $f(\sigma)$ estimates all updates that happened before its invocation. Specifically, a query invocation at the end of a finite execution \s,
+We have shown that each query in $f(\sigma)$ estimates all updates that happened before its invocation. Specifically, a query invocation at the end of a finite execution \s
 returns a value equal to the value returned by a sequential sketch after processing
 \A. By this, we have proven that $ f(\sigma) \in SeqSketch$.
 \end{proof}
@@ -177,7 +177,7 @@ Given a finite execution $\sigma$ of \mysketch, and given an operation $\mathnor
 If $\mathnormal{O}$ is a query then the proof is immediate since the visibility point and the linearization point of a query are equal. Else, $\mathnormal{O}$ is an update. By definition, the linearization point of an update happens before its visibility point. As the linearization point and visibility point of a query $\mathnormal{Q}$ are equal, it follows that if \(\mathnormal{Q} \prec_{l(\sigma)} \mathnormal{O}\) then \(\mathnormal{Q} \prec_{f(\sigma)} \mathnormal{O}\).
 \end{proof}
 
-Note that as query linearisation point is equal to its visibility point, all queries in $f(\sigma)$ will also be in $l(\sigma)$. 
+Note that as the query linearisation point is equal to its visibility point, all queries in $f(\sigma)$ will also be in $l(\sigma)$. 
 
 We give an upper bound on the number of updates in NUMA-local buffers.
 
@@ -185,7 +185,7 @@ We give an upper bound on the number of updates in NUMA-local buffers.
 Given a finite execution $\sigma$ of \mysketch, the maximum number of unpropagated update operations in all Gather\&Sort units is \(4kS\), where $S$ is the number of NUMA nodes: \[|\mathit{up\_suffix}(\sigma)| \leq 4kS.\]
 \end{lemma}
 \begin{proof}
-If an update is included in \(\mathit{up\_suffix}(\sigma)\), by definition, it is included in one of the G\&SBuffers. The size of each G\&SBuffer is less then or equal $2k$. By definition, if both arrays in a Gather\&Sort unit are full, no update thread (pinned to the same node as the Gather\&Sort unit) can copy his local buffer's elements. It follows that \(|\mathit{up\_suffix}(\sigma)| \leq 4kS\).
+If an update is included in \(\mathit{up\_suffix}(\sigma)\), by definition, it is included in one of the G\&SBuffers. The size of each G\&SBuffer is less than or equal to $2k$. By definition, if both arrays in a Gather\&Sort unit are full, no update thread (pinned to the same node as the Gather\&Sort unit) can copy his local buffer's elements. It follows that \(|\mathit{up\_suffix}(\sigma)| \leq 4kS\).
 \end{proof}
 
 Now, we give an upper bound on the number of updates in threads' local buffers.
@@ -205,8 +205,8 @@ To prove that $f(\sigma)$ is an \((4kS + (N-S)b)\)-relaxation of $l(\sigma)$, fi
 Given a finite execution $\sigma$ of \mysketch, \[ |f(\sigma)| \ge |l(\sigma)| - (4kS + (N-S)b) \]
 \end{lemma}
 \begin{proof}
-The linearization $l(\sigma)$ contains all updates that have been inserted to a thread locak buffer. $f(\sigma)$ contains all updates with visibility points, i.e., updates that have been propagated into the first level global sketch. 
-An update, made by thread $T_i$, without a visibility point is in $T_i$ local buffer or in one of the NUMA-local buffers of the G\&Sort unit that $T_i$ is pinned to. By definition, updates without visibility points are the unpropagated updates in G\&SBuffers and the unpropagated updates in the local buffer of each update thread. Each G\&Sort unit has an owner thread that tries to batch update into the global sketch. As such, for \(N\) update threads, $S$ update threads' local buffer is empty as each of they is an owner thread of a G\&Sort unit. Therefore,
+The linearization $l(\sigma)$ contains all updates that have been inserted into a thread's local buffer. $f(\sigma)$ contains all updates with visibility points, i.e., updates that have been propagated into the first level of the global sketch. 
+An update, made by thread $T_i$, without a visibility point is in $T_i$ local buffer or in one of the NUMA-local buffers of the G\&Sort unit that $T_i$ is pinned to. By definition, updates without visibility points are the unpropagated updates in G\&SBuffers and the unpropagated updates in the local buffer of each update thread. Each G\&Sort unit has an owner thread that tries to batch update into the global sketch. As such, for \(N\) update threads, $S$ update threads' local buffer is empty as each of them is an owner thread of a G\&Sort unit. Therefore,
 \begin{equation}
     |f(\sigma)| = |l(\sigma)| - \left(\sum_{i=1}^{N-S}|\mathit{up\_suffix_i}(\sigma)|\right) - |\mathit{up\_suffix}(\sigma)|
 \end{equation}
@@ -227,7 +227,7 @@ Let $\mathnormal{O}$ be an operation in $f(\sigma)$ such that $\mathnormal{O}$ i
 \begin{align}
     \mathnormal{Ops}=\{\mathnormal{O}'| \mathnormal{O}' \prec_{l(\sigma)} \mathnormal{O} \wedge  \mathnormal{O}' \nprec_{f(\sigma)} \mathnormal{O} \}.
 \end{align}
-By Lemma \ref{Lem: op_order}, as query linearization point is equal to its visibility point, query is in $f(\sigma)$ if and only is it is in $l(\sigma)$. Thus \( \mathnormal{Q} \notin \mathnormal{Ops} \) i.e., $\mathnormal{Ops}$ includes only update operations. Let \(\sigma^{pre}\) be the prefix of $\sigma$ and let \(\sigma^{post}\) be the suffix of $\sigma$ such that
+By Lemma \ref{Lem: op_order}, as the query linearization point is equal to its visibility point, a query is in $f(\sigma)$ if and only if it is in $l(\sigma)$. Thus \( \mathnormal{Q} \notin \mathnormal{Ops} \) i.e., $\mathnormal{Ops}$ includes only update operations. Let \(\sigma^{pre}\) be the prefix of $\sigma$ and let \(\sigma^{post}\) be the suffix of $\sigma$ such that
 \begin{align}
  l(\sigma)=\{\sigma^{pre},\mathnormal{O},\sigma^{post}\}.
 \end{align}

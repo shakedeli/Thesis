@@ -2,10 +2,10 @@
 \chapter{Evaluation}
 \label{chap:eval}
 
-In this chapter we measure \mysketch's throughput and accuracy of estimation. 
+In this chapter, we measure \mysketch's throughput and accuracy of estimation. 
 Section~\ref{sec:setup} presents the experiment setup and methodology.
 Section~\ref{sec:tput} presents throughput measurements and discusses scalability.
-Section~\ref{sec:params} experiments with different parameter setting, examining how performance is affected by query freshness. 
+Section~\ref{sec:params} experiments with different parameter settings, examining how performance is affected by query freshness. 
 Section~\ref{sec:accuracy} presents an accuracy of estimation analysis.
 Finally, Section~\ref{sec:compare} compares \mysketch\ to the state-of-the-art. 
 
@@ -18,7 +18,7 @@ The experiments were run on a NUMA system with four Intel Xeon E5-4650 processor
 
 
 Each thread was pinned to a NUMA node, and nodes were first filled before overflowing to other NUMA nodes, i.e., $8$ threads use only a single node, while $9$ use two nodes with $8$ threads on one and $1$ on the second. The default memory allocation policy is local allocation, except for \mysketch's shared pointers. Each Gather\&Sort unit is allocated on a different NUMA node and threads update the G\&SBuffers allocated on the node they belong to.
-The stream is drawn from a uniform distribution, unless stated otherwise. Each data point is an average of 15 runs, to minimize measurement noise.
+The stream is drawn from a uniform distribution unless stated otherwise. Each data point is an average of 15 runs, to minimize measurement noise.
 
  
 %============================================================
@@ -59,7 +59,7 @@ We measured \mysketch's throughput in three workloads:
 
 
 As shown in Figure \ref{fig:update_only_speedup}, \mysketch's performance in the update-only workload with a single thread is similar to the sequential algorithm and with more threads it scales linearly, reaching $12x$ the sequential throughput with 32 threads. 
-%Recall that the bottleneck of threads on the same NUMA node is sorting the buffer of size $2k$. As described in Section~\ref{Section: concurrent_algorithm}, the first two stages of \mysketch's update operation include filling and sorting threads local buffers and sorting the two G\&SBuffers. Note that the fill can be done concurrently, but the sort is sequential. The first $8$ threads running on the first NUMA node reach a peak and the empirical results match the theoretical expectations. For $N>8$, the throughput increases with the number of threads as adding NUMA nodes increases concurrency.
+%Recall that the bottleneck of threads on the same NUMA node is sorting the buffer of size $2k$. As described in Section~\ref{Section: concurrent_algorithm}, the first two stages of \mysketch's update operation include filling and sorting threads' local buffers and sorting the two G\&SBuffers. Note that the fill can be done concurrently, but the sort is sequential. The first $8$ threads running on the first NUMA node reach a peak and the empirical results match the theoretical expectations. For $N>8$, the throughput increases with the number of threads as adding NUMA nodes increases concurrency.
 We observe that the speedup is faster with fewer threads, we believe this is because once there are more than $8$ threads, the shared object is accessed from multiple NUMA nodes.
 %, thus the throughput above $8$ threads doesn't scale in the same manner as with the first $8$ threads. 
 
@@ -67,9 +67,9 @@ We observe that the speedup is faster with fewer threads, we believe this is bec
 Figure~\ref{fig:query_only_throughput} shows that, as expected, the throughput of the query-only workload scales linearly with the number of query threads, reaching $30x$ the sequential throughput with 32 threads.
 
 
-In the mixed workload, the parameter $\rho$ is significant for performance - when $\rho = 1$ ($\epsilon'=0$, no caching), a snapshot it reproduced on every query.
+In the mixed workload, the parameter $\rho$ is significant for performance - when $\rho = 1$ ($\epsilon'=0$, no caching), a snapshot is reproduced on every query.
 % We compare performance with $\rho = 0$ and $\rho = 0.05$.
-Figure~\ref{fig:mixed_throughput} presents the update throughput (left) and query throughput (right) in the presence of $1$ or $2$ update threads, with staleness thresholds of $\rho=1 (\epsilon'=0)$ and $\rho=1.05 (\epsilon'=0.05)$. We see that the caching mechanism ($\rho > 1$) is indeed crucial for performance. As expected, increasing the staleness threshold allows queries to use their local (possibly stale) snapshot, servicing queries faster and greatly increasing the query throughout. Furthermore, more update threads decrease the query throughput, as the update threads interfere with the query snapshot. 
+Figure~\ref{fig:mixed_throughput} presents the update throughput (left) and query throughput (right) in the presence of $1$ or $2$ update threads, with staleness thresholds of $\rho=1$ $(\epsilon'=0)$ and $\rho=1.05$ $(\epsilon'=0.05)$. We see that the caching mechanism ($\rho > 1$) is indeed crucial for performance. As expected, increasing the staleness threshold allows queries to use their local (possibly stale) snapshot, servicing queries faster and greatly increasing the query throughout. Furthermore, more update threads decrease the query throughput, as the update threads interfere with the query snapshot. 
 Finally, increasing the number of query threads decreases the update throughput, as query threads interfere with update threads, presumably due to cache invalidations of the shared state.
 
 
@@ -83,8 +83,8 @@ We see that the scalability trends are similar, and that \mysketch's throughput 
 This illustrates the tradeoff between the sketch size (memory footprint) to  throughput and accuracy. 
 
 
-Figure~\ref{fig: throughput_update_compare_b} experiments with different local buffer sizes, from $1$ to $64$, in update-only scenario with $k = 4096$ and up to $32$ update threads. Not surprisingly, the throughput increases as the local buffer grows as this enables more concurrency. 
-%As Figure~\ref{fig: accuracy_stderr} shows, this does not have a large impact on steady-state accuracy.
+Figure~\ref{fig: throughput_update_compare_b} experiments with different local buffer sizes, from $1$ to $64$, in an update-only scenario with $k = 4096$ and up to $32$ update threads. Not surprisingly, the throughput increases as the local buffer grow as this enables more concurrency. 
+%As Figure~\ref{fig: accuracy_stderr} shows this does not have a large impact on steady-state accuracy.
 
 
 In Figure~\ref{fig: update_query_compare_rho} we vary $\rho$, in a mixed update-query workload with $8$ update threads, $24$ query threads, $k = 1024$, and $b = 16$, exploring another aspect of query freshness versus performance. As expected, increasing  $\rho$ has a positive impact on query throughput, as the cached snapshot can be queried more often.  Figure~\ref{fig: update_query_compare_rho} also shows the miss rate, which is the percentage of queries that need to re-construct the snapshot.
@@ -122,7 +122,7 @@ In Figure~\ref{fig: update_query_compare_rho} we vary $\rho$, in a mixed update-
 \label{sec:accuracy} 
 %============================================================
 To measure the estimate accuracy, we consider a query invoked in a quiescent state where no updates occur concurrently with the query. Figure~\ref{fig: accuracy_stderr} shows the standard error of 1M estimations in a quiescent state.%(with no concurrent updates). If the stream distribution does not change over time, this reflects the steady state estimation. While in theory, in order for \mysketch with $b=16$ and $N>1$ threads to provide the same error guarantee as the sequential Quantiles sketch with $k_{seq}$, we need to instantiate the sketch with the $k$ parameter larger by an order of magnitude. Figure~\ref{fig: accuracy_stderr} shows that in practice, in a quiescent state, \mysketch's estimations are similar to the sequential ones using the same $k$. 
-We see that \mysketch's estimations are similar to the sequential ones using the same $k$, and improves with larger values of $k$ as known from the literature on sequential sketches~\cite{mergeables_summaries}.
+We see that \mysketch's estimations are similar to the sequential ones using the same $k$, and improve with larger values of $k$ as known from the literature on sequential sketches~\cite{mergeables_summaries}.
 \begin{figure}[h!]
     \centering
     \includegraphics[width=0.8\textwidth,trim={0 0cm 0cm 1.7cm},clip]
@@ -154,82 +154,119 @@ To illustrate the impact of $k$ visually, Figure~\ref{fig:cdf} compares the dist
 \end{figure}
 
 %============================================================
-\section{Comparison to state of the art}
+\section{Comparison to State of the Art}
 \label{sec:compare} 
 %============================================================
-Finally, we compare \mysketch against a concurrent Quantiles sketch implemented within the FCDS framework~\cite{Rinberg_2020_fast_sketches}, the only previously suggested concurrent sketch we know that supports quantiles. Figure~\ref{fig:compare_FCDS_k4096} shows the throughput results (log scale) for $8$, $16$, $24$ and $32$ threads and $k=4096$.
-FCDS satisfies relaxed consistency with a relaxation of up to $2NB$, where $N$ is the number of worker threads and $B$ is the buffer size of each worker. Recall that \mysketch's relaxation is at most $r = 4kS+(N-S)b$. For a fair comparison, we compare the two algorithms in settings with the same relaxation.
+Finally, we compare \mysketch against a concurrent Quantiles sketch implemented within the FCDS framework~\cite{Rinberg_2020_fast_sketches}, the only previously suggested concurrent sketch we know that supports quantiles. Figure~\ref{fig:compare_FCDS_k4096} (and Table~\ref{table:FCDS-4096-full-eval}) show the throughput results (log scale) for $8$, $16$, $24$ and $32$ threads and $k=4096$.
+FCDS satisfies relaxed consistency with a relaxation of up to $2NB$, where $N$ is the number of worker threads and $B$ is the buffer size of each worker. Recall that \mysketch's relaxation is at most $r = 4kS+(N-S)b$. Thus:
+\begin{align}
+    r_{\scriptscriptstyle\rm FCDS} &= 2NB \\
+    r_{\scriptscriptstyle\rm \mysketch} &= 4kS+(N-S)b
+\end{align}
+For a fair comparison, we compare the two algorithms in settings with the same relaxation, as follows:
+\begin{align}
+    r_{\scriptscriptstyle\rm FCDS} &= r_{\scriptscriptstyle\rm \mysketch} \\
+    2NB &= 4kS+(N-S)b \\ 
+    B &= \frac{4kS+(N-S)b}{2N}\label{eq:B_equal_r}
+\end{align}
+ % We calculated a series of matching $B$ values (FCDS's local buffer size), using Equation~\ref{eq:B_equal_r}, for a series of $b$ values (\mysketch' local buffer size) such that $b=\{2^i: i = 0,1,\dots\}$.
+ Given the sketch parameter $k$, the number of update threads $N$, the number of NUMA nodes $S$, and a series of \mysketch' local buffer sizes $b_i$ such that $b=\{2^i: i = 0,1,\dots\}$, we calculate the corresponding $B_i$ values (FCDS's local buffer size), using Equation~\ref{eq:B_equal_r}.
+ 
+ The results are listed in Table~\ref{table:FCDS-4096-full-eval}. Note that the size of the local buffer $b$ is bounded by the size of the \emph{G\&SBuffer} array, which is $2k$. Each row lists the parameters needed to get equal relaxation in both algorithms. We calculated the throughput for each algorithm and the results are shown in Figure~\ref{fig:compare_FCDS_k4096}. For clarity, some points with the same relaxation were colored the same in both lines. In addition, we specify the size of the buffer.
+
 
 For $8$ update threads ($S=1$) and $b=2048$, the relaxation of \mysketch is $r\approx 30K$. The same relaxation in FCDS with the same number of update threads is achieved with a buffer size of $B=1920$.
-With $8$ threads, \mysketch reaches a throughput of $22M\ ops/sec$ for a relaxation of $30K$ whereas FCDS reaches a throughput of $25M\ ops/sec$ for a much larger relaxation of $137K$. Also, with $32$ threads, \mysketch reaches a throughput of $62M\ ops/sec$ for a relaxation of $122K$, but FCDS only reaches a throughput of $19M\ ops/sec$ with a relaxation of more than $500K$.
+With $8$ threads, \mysketch reaches a throughput of $22M\ ops/sec$ for a relaxation of $30K$ whereas FCDS reaches a throughput of $25.8M\ ops/sec$ for a much larger relaxation of $131K$. Also, with $32$ threads, \mysketch reaches a throughput of $62M\ ops/sec$ for a relaxation of $123K$, but FCDS only reaches a throughput of $19.4M\ ops/sec$ with a relaxation of more than $500K$.  
 
 Overall, we see that FCDS requires large buffers (resulting in a high relaxation and low query freshness) in order to scale with the number of threads. This is because, unlike \mysketch, FCDS uses a single thread to propagate data from all other threads' local buffers into the shared sketch. The propagation involves a heavy merge-sort, so large local buffers are required in order to offset it and keep the working threads busy during the propagation. In contrast, \mysketch's propagation is collaborative, with merge-sorts occurring concurrently both at the NUMA node level (in Gather\&Sort buffers) and at multiple levels of the shared sketch.
-\todo[color=red]{consider put b,B values}
-% \mysketch scales better for small relaxation then FCDS. This is because FCDS uses a single propagator thread and no shared buffers, and therefore requires much larger local buffers in order to offset the amount of work done by the propagator thread.
 
-
-
-% \begin{figure}[]
-%  \centering
-%  \begin{minipage}[H]{0.45\textwidth}
-%         \centering
-%         \captionsetup{skip=0pt}
-%         \captionof{table}{\mysketch vs. FCDS, k = 256, \#keys = 10M.}
-%         % \resizebox{\textwidth}{} {
-%         % \begin{tabular} {c{20pt}|l{30pt}|l{50pt}|c{25pt}c{25pt}|r{30pt}|r{50pt}}
-%         \resizebox{\textwidth}{!}{%
-%         \tiny
-%         \begin{tabular} {@{}c|lc|cc|lc@{}} \toprule
-%         %  & \multicolumn{6}{c}{k = 256} \\
-%         % \cmidrule(r){2-7}
-%          \multicolumn{1}{c}{}  & \multicolumn{3}{c|}{Quancurrent}  & \multicolumn{3}{c}{FCDS} \\  
-%                 \cmidrule(r){1-7}
-%         N      &    b    &   Throughput$[\frac{\textit{op}}{\textit{sec}}]$  &   \multicolumn{2}{c|}{r}  &   B       &   Throughput$[\frac{\textit{op}}{\textit{sec}}]$ \\ \midrule
-%                 &       &                       &    \phantom{xxx}  &    \phantom{xxx}       &           &          \\[-\normalbaselineskip] % fake/empty row
-%         8      &   1    &  \prefix{8.41E+06}    &   \multicolumn{2}{c|}{\prefix{1.02E+03}}   &    64     &    \prefix{5.60E+06}\\
-%               &   4    &  \prefix{1.35E+07}    &   \multicolumn{2}{c|}{\prefix{1.06E+03}}   &    66     &    \prefix{5.60E+06}\\
-%               &   8    &  \prefix{1.58E+07}    &   \multicolumn{2}{c|}{\prefix{1.09E+03}}   &    68     &    \prefix{5.70E+06}\\
-%               &   16   &  \prefix{1.76E+07}    &   \multicolumn{2}{c|}{\prefix{1.14E+03}}   &    71     &    \prefix{5.70E+06}\\
-%               &   32   &  \prefix{1.93E+07}    &   \multicolumn{2}{c|}{\prefix{1.25E+03}}   &    78     &    \prefix{5.70E+06}\\
-%               &   64   &  \prefix{2.02E+07}    &   \multicolumn{2}{c|}{\prefix{1.47E+03}}   &    92     &    \prefix{5.80E+06}\\
-%               &   128  &  \prefix{2.10E+07}    &   \multicolumn{2}{c|}{\prefix{1.92E+03}}   &    120    &    \prefix{5.90E+06}\\
-%               &   256  &  \prefix{1.53E+07}    &   \multicolumn{2}{c|}{\prefix{2.82E+03}}   &    176    &    \prefix{6.00E+06}\\
-%               &   512  &  \prefix{8.13E+06}    &   \multicolumn{2}{c|}{\prefix{4.61E+03}}   &    288    &    \prefix{6.10E+06}\\
-%               &        &                       &   \multicolumn{2}{c|}{\prefix{8.19E+03}}   &    512    &    \prefix{3.01E+07}\\
-%               &        &                       &   \multicolumn{2}{c|}{\prefix{1.54E+04}}   &    960    &    \prefix{1.25E+07}\\
-%               &        &                       &   \multicolumn{2}{c|}{\prefix{2.97E+04}}   &    1856   &    \prefix{2.95E+07}\\
-%         32     &   1    &  \prefix{6.44E+06}    &   \multicolumn{2}{c|}{\prefix{4.10E+03}}   &    64     &    \prefix{4.40E+06}\\
-%               &   4    &  \prefix{6.28E+06}    &   \multicolumn{2}{c|}{\prefix{4.22E+03}}   &    66     &    \prefix{4.40E+06}\\
-%               &   8    &  \prefix{6.31E+06}    &   \multicolumn{2}{c|}{\prefix{4.35E+03}}   &    68     &    \prefix{4.50E+06}\\
-%               &   16   &  \prefix{6.27E+06}    &   \multicolumn{2}{c|}{\prefix{4.54E+03}}   &    71     &    \prefix{4.40E+06}\\
-%               &   32   &  \prefix{6.13E+06}    &   \multicolumn{2}{c|}{\prefix{4.99E+03}}   &    78     &    \prefix{4.50E+06}\\
-%               &   64   &  \prefix{5.80E+06}    &   \multicolumn{2}{c|}{\prefix{5.89E+03}}   &    92     &    \prefix{4.60E+06}\\
-%               &   128  &  \prefix{5.90E+06}    &   \multicolumn{2}{c|}{\prefix{7.68E+03}}   &    120    &    \prefix{4.80E+06}\\
-%               &   256  &  \prefix{6.38E+06}    &   \multicolumn{2}{c|}{\prefix{1.13E+04}}   &    176    &    \prefix{5.20E+06}\\
-%               &   512  &  \prefix{6.12E+06}    &   \multicolumn{2}{c|}{\prefix{1.84E+04}}   &    288    &    \prefix{5.40E+06}\\
-%               &        &                       &   \multicolumn{2}{c|}{\prefix{3.28E+04}}   &    512    &    \prefix{2.12E+07}\\
-%               &        &                       &   \multicolumn{2}{c|}{\prefix{6.14E+04}}   &    960    &    \prefix{1.11E+07}\\
-%               &        &                       &   \multicolumn{2}{c|}{\prefix{1.19E+05}}   &    1856   &    \prefix{1.93E+07}\\ 
-%         \bottomrule
-%         \end{tabular} 
-%         }
-%   \end{minipage}
-%     \par\bigskip
-%     \begin{minipage}[H]{0.45\textwidth}
-%     % \centering
-%     % \rule{5.5cm}{2.6cm} % Height changed from 3.6cm to 2.6cm
-%     % \captionof{figure}{A table beside a figure}
-%     \centering
-%     \includegraphics[width=\textwidth,trim={0.1cm 0.2cm 1.9cm 0.1cm},clip]
-%     {images/graphs/FCDS/oracle_Quancurrent_vs_FCDS_blocking_numa_update_k256_keys10M_T8_32_runs15_equal_relax_log_scale_largeB_26-06-2022_14-04-13.pdf}
-%     \captionof{figure}{\mysketch vs. FCDS, k = 256.}
-%     \label{fig: FCDS k256}
-%   \end{minipage}
-% \end{figure}
+% \mysketch scales better for small relaxation than FCDS. This is because FCDS uses a single propagator thread and no shared buffers, and therefore requires much larger local buffers to offset the amount of work done by the propagator thread.
 
 \begin{figure}[h]
 \includegraphics[width=\textwidth,trim={0cm 0cm 0cm 0cm},clip]
-{graphics/graphs/FCDS/oracle_Quancurrent_vs_FCDS_block_numa_up_k4096_keys10M_T8-32_runs15_equal_relax_log_largeB_rm_last2_diff_axes_name_16-09-2022_18-59-50.pdf}
+{graphics/graphs/FCDS/oracle_QvsFCDS_block_numa_update_k4096_keys10M_T8_16_24_32_runs15_eq_relax_logscale_largeB_RmLast2_colorPoints_25-12-2022_08-36-36.pdf}
 \caption{\mysketch vs. FCDS, $k=4096$.}
 \label{fig:compare_FCDS_k4096}
 \end{figure}
+
+\newpage
+\begin{table}[h]
+\captionsetup{skip=0pt}
+\caption{\mysketch vs. FCDS, k = 4096, \#keys = 10M}
+\label{table:FCDS-4096-full-eval}
+\centering
+\footnotesize
+% \resizebox{\textwidth}{} {
+% \begin{tabular} {c{20pt}|l{30pt}|l{50pt}|c{25pt}c{25pt}|r{30pt}|r{50pt}}
+% \resizebox{\textwidth}{!}{%
+\begin{tabular} {@{}c|lc|cc|lc@{}} \toprule
+%  & \multicolumn{6}{c}{k = 256} \\
+% \cmidrule(r){2-7}
+ \multicolumn{1}{c}{}  & \multicolumn{3}{c|}{Quancurrent}  & \multicolumn{3}{c}{FCDS} \\  
+        \cmidrule(r){1-7}
+        % &       &                       &    \phantom{xxx}  &    \phantom{xxx}       &           &          \\[-\normalbaselineskip] % fake/empty row
+N      &    b    &   Throughput$[\frac{\textit{op}}{\textit{sec}}]$  &   \multicolumn{2}{c|}{r}  &   B       &   Throughput$[\frac{\textit{op}}{\textit{sec}}]$ \\ \midrule
+        &       &                       &    \phantom{xxx}  &    \phantom{xxx}       &           &          \\[-\normalbaselineskip] % fake/empty row
+8        &   1       &   \prefix{7.10E+06}    &   \multicolumn{2}{c|}{\prefix{1.64E+04}}    &   1024    &   \prefix{4.5E+6}\\
+        &   4       &   \prefix{1.09E+07}    &   \multicolumn{2}{c|}{\prefix{1.64E+04}}    &   1026    &   \prefix{4.6E+6}\\
+        &   8       &   \prefix{1.24E+07}    &   \multicolumn{2}{c|}{\prefix{1.64E+04}}    &   1028    &   \prefix{4.6E+6}\\
+        &   16      &   \prefix{1.35E+07}    &   \multicolumn{2}{c|}{\prefix{1.65E+04}}    &   1031    &   \prefix{4.6E+6}\\
+        &   32      &   \prefix{1.46E+07}    &   \multicolumn{2}{c|}{\prefix{1.66E+04}}    &   1038    &   \prefix{4.5E+6}\\
+        &   64      &   \prefix{1.60E+07}    &   \multicolumn{2}{c|}{\prefix{1.68E+04}}    &   1052    &   \prefix{4.5E+6}\\
+        &   128     &   \prefix{1.75E+07}    &   \multicolumn{2}{c|}{\prefix{1.73E+04}}    &   1080    &   \prefix{4.5E+6}\\
+        &   256     &   \prefix{1.92E+07}    &   \multicolumn{2}{c|}{\prefix{1.82E+04}}    &   1136    &   \prefix{4.6E+6}\\
+        &   512     &   \prefix{2.07E+07}    &   \multicolumn{2}{c|}{\prefix{2.00E+04}}    &   1248    &   \prefix{4.6E+6}\\
+        &   1024    &   \prefix{2.00E+07}    &   \multicolumn{2}{c|}{\prefix{2.36E+04}}    &   1472    &   \prefix{4.6E+6}\\
+        &   2048    &   \prefix{2.20E+07}    &   \multicolumn{2}{c|}{\prefix{3.07E+04}}    &   1920    &   \prefix{4.6E+6}\\
+        &   4096    &   \prefix{1.30E+07}   &   \multicolumn{2}{c|}{\prefix{4.51E+04}}    &   2816    &   \prefix{4.7E+6}\\
+        &   8192    &   \prefix{7.13E+06}   &   \multicolumn{2}{c|}{\prefix{7.37E+04}}    &   4608    &   \prefix{4.7E+6}\\
+        &           &                        &   \multicolumn{2}{c|}{\prefix{1.31E+05}}    &   8192    &   \prefix{25.8E+6}\\ \hline
+
+16        &   1       &   \prefix{1.41E+07}    &   \multicolumn{2}{c|}{\prefix{3.28E+04}}    &   1024    &   \prefix{4.4E+6}\\
+        &   4       &   \prefix{2.11E+07}    &   \multicolumn{2}{c|}{\prefix{3.28E+04}}    &   1026    &   \prefix{4.4E+6}\\
+        &   8       &   \prefix{2.40E+07}    &   \multicolumn{2}{c|}{\prefix{3.29E+04}}    &   1028    &   \prefix{4.4E+6}\\
+        &   16      &   \prefix{2.63E+07}    &   \multicolumn{2}{c|}{\prefix{3.30E+04}}    &   1031    &   \prefix{4.5E+6}\\
+        &   32      &   \prefix{2.88E+07}    &   \multicolumn{2}{c|}{\prefix{3.32E+04}}    &   1038    &   \prefix{4.4E+6}\\
+        &   64      &   \prefix{3.13E+07}    &   \multicolumn{2}{c|}{\prefix{3.37E+04}}    &   1052    &   \prefix{4.4E+6}\\
+        &   128     &   \prefix{3.40E+07}    &   \multicolumn{2}{c|}{\prefix{3.46E+04}}    &   1080    &   \prefix{4.4E+6}\\
+        &   256     &   \prefix{3.43E+07}    &   \multicolumn{2}{c|}{\prefix{3.64E+04}}    &   1136    &   \prefix{4.4E+6}\\
+        &   512     &   \prefix{4.00E+07}    &   \multicolumn{2}{c|}{\prefix{3.99E+04}}    &   1248    &   \prefix{4.5E+6}\\
+        &   1024    &   \prefix{3.92E+07}    &   \multicolumn{2}{c|}{\prefix{4.71E+04}}    &   1472    &   \prefix{4.5E+6}\\
+        &   2048    &   \prefix{4.33E+07}    &   \multicolumn{2}{c|}{\prefix{6.14E+04}}    &   1920    &   \prefix{4.6E+6}\\
+        &   4096    &   \prefix{2.53E+07}    &   \multicolumn{2}{c|}{\prefix{9.01E+04}}    &   2816    &   \prefix{4.6E+6}\\
+        &   8192    &   \prefix{1.40E+07}    &   \multicolumn{2}{c|}{\prefix{1.47E+05}}    &   4608    &   \prefix{4.7E+6}\\
+        &           &                        &   \multicolumn{2}{c|}{\prefix{2.62E+05}}    &   8192    &   \prefix{15.7E+6}\\ \hline
+24        &   1       &   \prefix{2.10E+07}    &   \multicolumn{2}{c|}{\prefix{4.92E+04}}    &   1024    &   \prefix{4.3E+6}\\
+        &   4       &   \prefix{3.14E+07}    &   \multicolumn{2}{c|}{\prefix{4.92E+04}}    &   1026    &   \prefix{4.3E+6}\\
+        &   8       &   \prefix{3.58E+07}    &   \multicolumn{2}{c|}{\prefix{4.93E+04}}    &   1028    &   \prefix{4.4E+6}\\
+        &   16      &   \prefix{3.96E+07}    &   \multicolumn{2}{c|}{\prefix{4.95E+04}}    &   1031    &   \prefix{4.3E+6}\\
+        &   32      &   \prefix{4.24E+07}    &   \multicolumn{2}{c|}{\prefix{4.98E+04}}    &   1038    &   \prefix{4.4E+6}\\
+        &   64      &   \prefix{4.60E+07}    &   \multicolumn{2}{c|}{\prefix{5.05E+04}}    &   1052    &   \prefix{4.4E+6}\\
+        &   128     &   \prefix{5.01E+07}    &   \multicolumn{2}{c|}{\prefix{5.18E+04}}    &   1080    &   \prefix{4.3E+6}\\
+        &   256     &   \prefix{5.33E+07}    &   \multicolumn{2}{c|}{\prefix{5.45E+04}}    &   1136    &   \prefix{4.3E+6}\\
+        &   512     &   \prefix{5.86E+07}    &   \multicolumn{2}{c|}{\prefix{5.99E+04}}    &   1248    &   \prefix{4.4E+6}\\
+        &   1024    &   \prefix{5.71E+07}    &   \multicolumn{2}{c|}{\prefix{7.07E+04}}    &   1472    &   \prefix{4.4E+6}\\
+        &   2048    &   \prefix{6.15E+07}    &   \multicolumn{2}{c|}{\prefix{9.22E+04}}    &   1920    &   \prefix{4.5E+6}\\
+        &   4096    &   \prefix{3.69E+07}   &   \multicolumn{2}{c|}{\prefix{1.35E+05}}    &   2816    &   \prefix{4.6E+6}\\
+        &   8192    &   \prefix{2.08E+07}     &   \multicolumn{2}{c|}{\prefix{2.21E+05}}    &   4608    &   \prefix{4.6E+6}\\
+        &           &                        &   \multicolumn{2}{c|}{\prefix{3.93E+05}}    &   8192    &   \prefix{16.2E+6}\\ \hline
+32        &   1       &   \prefix{2.76E+07}    &   \multicolumn{2}{c|}{\prefix{6.55E+04}}    &   1024    &   \prefix{4.3E+6}\\
+        &   4       &   \prefix{4.12E+07}    &   \multicolumn{2}{c|}{\prefix{6.57E+04}}    &   1026    &   \prefix{4.3E+6}\\
+        &   8       &   \prefix{4.72E+07}    &   \multicolumn{2}{c|}{\prefix{6.58E+04}}    &   1028    &   \prefix{4.3E+6}\\
+        &   16      &   \prefix{5.19E+07}    &   \multicolumn{2}{c|}{\prefix{6.60E+04}}    &   1031    &   \prefix{4.3E+6}\\
+        &   32      &   \prefix{5.54E+07}    &   \multicolumn{2}{c|}{\prefix{6.64E+04}}    &   1038    &   \prefix{4.3E+6}\\
+        &   64      &   \prefix{5.97E+07}    &   \multicolumn{2}{c|}{\prefix{6.73E+04}}    &   1052    &   \prefix{4.4E+6}\\
+        &   128     &   \prefix{6.43E+07}    &   \multicolumn{2}{c|}{\prefix{6.91E+04}}    &   1080    &   \prefix{4.4E+6}\\
+        &   256     &   \prefix{6.65E+07}    &   \multicolumn{2}{c|}{\prefix{7.27E+04}}    &   1136    &   \prefix{4.4E+6}\\
+        &   512     &   \prefix{6.46E+07}    &   \multicolumn{2}{c|}{\prefix{7.99E+04}}    &   1248    &   \prefix{4.4E+6}\\
+        &   1024    &   \prefix{6.64E+07}    &   \multicolumn{2}{c|}{\prefix{9.42E+04}}    &   1472    &   \prefix{4.4E+6}\\
+        &   2048    &   \prefix{6.23E+07}    &   \multicolumn{2}{c|}{\prefix{1.23E+05}}    &   1920    &   \prefix{4.5E+6}\\
+        &   4096    &   \prefix{4.81E+07}     &   \multicolumn{2}{c|}{\prefix{1.80E+05}}    &   2816    &   \prefix{4.6E+6}\\
+        &   8196    &   \prefix{2.73E+07}     &   \multicolumn{2}{c|}{\prefix{2.95E+05}}    &   4608    &   \prefix{4.6E+6}\\
+        &           &                        &   \multicolumn{2}{c|}{\prefix{5.24E+05}}    &   8192    &   \prefix{19.4E+6}\\
+\bottomrule
+\end{tabular} 
+% }
+% \caption{\mysketch vs. FCDS, k = 4096, \#keys = 10M}
+% \label{table: FCDS 4096 (full)}
+\end{table}

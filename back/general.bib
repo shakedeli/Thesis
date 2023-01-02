@@ -509,3 +509,241 @@ series = {ISCA '93}
   year = "Accessed September 22, 2022"
 }
 
+@article{Cormode_2011_disributed_monitoring,
+author = {Cormode, Graham and Muthukrishnan, S. and Yi, Ke},
+title = {Algorithms for Distributed Functional Monitoring},
+year = {2011},
+issue_date = {March 2011},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+volume = {7},
+number = {2},
+issn = {1549-6325},
+url = {https://doi.org/10.1145/1921659.1921667},
+doi = {10.1145/1921659.1921667},
+journal = {ACM Trans. Algorithms},
+month = {mar},
+articleno = {21},
+numpages = {20},
+keywords = {Distributed computing, functional monitoring}
+}
+
+
+@inproceedings{Heule_2013_cardinality_est,
+author = {Heule, Stefan and Nunkesser, Marc and Hall, Alexander},
+title = {HyperLogLog in Practice: Algorithmic Engineering of a State of the Art Cardinality Estimation Algorithm},
+year = {2013},
+isbn = {9781450315975},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/2452376.2452456},
+doi = {10.1145/2452376.2452456},
+booktitle = {Proceedings of the 16th International Conference on Extending Database Technology},
+pages = {683–692},
+numpages = {10},
+location = {Genoa, Italy},
+series = {EDBT '13}
+}
+
+
+@article{MunroPeterson1980,
+title = {Selection and sorting with limited storage},
+journal = {Theoretical Computer Science},
+volume = {12},
+number = {3},
+pages = {315-323},
+year = {1980},
+issn = {0304-3975},
+doi = {https://doi.org/10.1016/0304-3975(80)90061-4},
+url = {https://www.sciencedirect.com/science/article/pii/0304397580900614},
+author = {J.I. Munro and M.S. Paterson},
+abstract = {When selecting from, or sorting, a file stored on a read-only tape and the internal storage is rather limited, several passes of the input tape may be required. We study the relation between the amount of internal storage available and the number of passes required to select the Kth highest of N inputs. We show, for example, that to find the median in two passes requires at least ω(N12) and at most O(N12log N) internal storage. For probabilistic methods, θ(N12) internal storage is necessary and sufficient for a single pass method which finds the median with arbitrarily high probability.}
+}
+
+
+@inproceedings{HungTing2010Omega,
+  title={An $\Omega (\frac{1}{\epsilon}log \frac {1}{\epsilon}) $ Space Lower Bound for Finding $\epsilon$-Approximate Quantiles in a Data Stream},
+  author={Hung, Regant and Ting, Hingfung F},
+  booktitle={International Workshop on Frontiers in Algorithmics},
+  pages={89--100},
+  year={2010},
+  organization={Springer}
+}
+
+@inproceedings{MankuRajagoplanLindsay1998,
+author = {Manku, Gurmeet Singh and Rajagopalan, Sridhar and Lindsay, Bruce G.},
+title = {Approximate Medians and Other Quantiles in One Pass and with Limited Memory},
+year = {1998},
+isbn = {0897919955},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/276304.276342},
+doi = {10.1145/276304.276342},
+abstract = {We present new algorithms for computing approximate quantiles of large datasets in a single pass. The approximation guarantees are explicit, and apply for arbitrary value distributions and arrival distributions of the dataset. The main memory requirements are smaller than those reported earlier by an order of magnitude.We also discuss methods that couple the approximation algorithms with random sampling to further reduce memory requirements. With sampling, the approximation guarantees are explicit but probabilistic, i.e. they apply with respect to a (user controlled) confidence parameter.We present the algorithms, their theoretical analysis and simulation results on different datasets.},
+booktitle = {Proceedings of the 1998 ACM SIGMOD International Conference on Management of Data},
+pages = {426–435},
+numpages = {10},
+location = {Seattle, Washington, USA},
+series = {SIGMOD '98}
+}
+
+
+@inproceedings{MankuRajagoplanLindsay1999,
+author = {Manku, Gurmeet Singh and Rajagopalan, Sridhar and Lindsay, Bruce G.},
+title = {Random Sampling Techniques for Space Efficient Online Computation of Order Statistics of Large Datasets},
+year = {1999},
+isbn = {1581130848},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/304182.304204},
+doi = {10.1145/304182.304204},
+abstract = {In a recent paper [MRL98], we had described a general framework for single pass approximate quantile finding algorithms. This framework included several known algorithms as special cases. We had identified a new algorithm, within the framework, which had a significantly smaller requirement for main memory than other known algorithms. In this paper, we address two issues left open in our earlier paper.First, all known and space efficient algorithms for approximate quantile finding require advance knowledge of the length of the input sequence. Many important database applications employing quantiles cannot provide this information. In this paper, we present a novel non-uniform random sampling scheme and an extension of our framework. Together, they form the basis of a new algorithm which computes approximate quantiles without knowing the input sequence length.Second, if the desired quantile is an extreme value (e.g., within the top 1\% of the elements), the space requirements of currently known algorithms are overly pessimistic. We provide a simple algorithm which estimates extreme values using less space than required by the earlier more general technique for computing all quantiles. Our principal observation here is that random sampling is quantifiably better when estimating extreme values than is the case with the median.},
+booktitle = {Proceedings of the 1999 ACM SIGMOD International Conference on Management of Data},
+pages = {251–262},
+numpages = {12},
+location = {Philadelphia, Pennsylvania, USA},
+series = {SIGMOD '99}
+}
+
+
+
+@inproceedings{Shrivastava2004Qdigest,
+author = {Shrivastava, Nisheeth and Buragohain, Chiranjeeb and Agrawal, Divyakant and Suri, Subhash},
+title = {Medians and beyond: New Aggregation Techniques for Sensor Networks},
+year = {2004},
+isbn = {1581138792},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/1031495.1031524},
+doi = {10.1145/1031495.1031524},
+abstract = {Wireless sensor networks offer the potential to span and monitor large geographical areas inexpensively. Sensors, however, have significant power constraint (battery life), making communication very expensive. Another important issue in the context of sensor-based information systems is that individual sensor readings are inherently unreliable. In order to address these two aspects, sensor database systems like TinyDB and Cougar enable in-network data aggregation to reduce the communication cost and improve reliability. The existing data aggregation techniques, however, are limited to relatively simple types of queries such as SUM, COUNT, AVG, and MIN/MAX. In this paper we propose a data aggregation scheme that significantly extends the class of queries that can be answered using sensor networks. These queries include (approximate) quantiles, such as the median, the most frequent data values, such as the consensus value, a histogram of the data distribution, as well as range queries. In our scheme, each sensor aggregates the data it has received from other sensors into a fixed (user specified) size message. We provide strict theoretical guarantees on the approximation quality of the queries in terms of the message size. We evaluate the performance of our aggregation scheme by simulation and demonstrate its accuracy, scalability and low resource utilization for highly variable input data sets.},
+booktitle = {Proceedings of the 2nd International Conference on Embedded Networked Sensor Systems},
+pages = {239–249},
+numpages = {11},
+keywords = {distributed algorithms, sensor networks, aggregation, approximation algorithms},
+location = {Baltimore, MD, USA},
+series = {SenSys '04}
+}
+
+
+@inproceedings{KarninKevinLiberty2016,
+  author={Karnin, Zohar and Lang, Kevin and Liberty, Edo},
+  booktitle={2016 IEEE 57th Annual Symposium on Foundations of Computer Science (FOCS)}, 
+  title={Optimal Quantile Approximation in Streams}, 
+  year={2016},
+  volume={},
+  number={},
+  pages={71-78},
+  doi={10.1109/FOCS.2016.17}
+}
+
+@inproceedings{WangLuoYiCormode2013,
+author = {Wang, Lu and Luo, Ge and Yi, Ke and Cormode, Graham},
+title = {Quantiles over Data Streams: An Experimental Study},
+year = {2013},
+isbn = {9781450320375},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/2463676.2465312},
+doi = {10.1145/2463676.2465312},
+abstract = {A fundamental problem in data management and analysis is to generate descriptions of the distribution of data. It is most common to give such descriptions in terms of the cumulative distribution, which is characterized by the quantiles of the data. The design and engineering of efficient methods to find these quantiles has attracted much study, especially in the case where the data is described incrementally, and we must compute the quantiles in an online, streaming fashion. Yet while such algorithms have proved to be tremendously useful in practice, there has been limited formal comparison of the competing methods, and no comprehensive study of their performance. In this paper, we remedy this deficit by providing a taxonomy of different methods, and describe efficient implementations. In doing so, we propose and analyze variations that have not been explicitly studied before, yet which turn out to perform the best. To illustrate this, we provide detailed experimental comparisons demonstrating the tradeoffs between space, time, and accuracy for quantile computation.},
+booktitle = {Proceedings of the 2013 ACM SIGMOD International Conference on Management of Data},
+pages = {737–748},
+numpages = {12},
+keywords = {data stream algorithms, quantiles},
+location = {New York, New York, USA},
+series = {SIGMOD '13}
+}
+
+@article{Cormode2011SketchTechniques,
+  title={Sketch techniques for approximate query processing},
+  author={Cormode, Graham},
+  journal={Foundations and Trends in Databases. NOW publishers},
+  pages={15},
+  year={2011}
+}
+
+@article{Zhao2021KLLPlus,
+author = {Zhao, Fuheng and Maiyya, Sujaya and Wiener, Ryan and Agrawal, Divyakant and Abbadi, Amr El},
+title = {KLL± Approximate Quantile Sketches over Dynamic Datasets},
+year = {2021},
+issue_date = {March 2021},
+publisher = {VLDB Endowment},
+volume = {14},
+number = {7},
+issn = {2150-8097},
+url = {https://doi.org/10.14778/3450980.3450990},
+doi = {10.14778/3450980.3450990},
+abstract = {Recently the long standing problem of optimal construction of quantile sketches was resolved by Karnin, Lang, and Liberty using the KLL sketch (FOCS 2016). The algorithm for KLL is restricted to online insert operations and no delete operations. For many real-world applications, it is necessary to support delete operations. When the data set is updated dynamically, i.e., when data elements are inserted and deleted, the quantile sketch should reflect the changes. In this paper, we propose KLL±, the first quantile approximation algorithm to operate in the bounded deletion model to account for both inserts and deletes in a given data stream. KLL± extends the functionality of KLL sketches to support arbitrary updates with small space overhead. The space bound for KLL± is [EQUATION], where ∈ and δ are constants that determine precision and failure probability, and α bounds the number of deletions with respect to insert operations. The experimental evaluation of KLL± highlights that with minimal space overhead, KLL± achieves comparable accuracy in quantile approximation to KLL.},
+journal = {Proc. VLDB Endow.},
+month = {apr},
+pages = {1215–1227},
+numpages = {13}
+}
+
+
+@article{Cormode2005CountMinSketch,
+  title={An improved data stream summary: the count-min sketch and its applications},
+  author={Cormode, Graham and Muthukrishnan, Shan},
+  journal={Journal of Algorithms},
+  volume={55},
+  number={1},
+  pages={58--75},
+  year={2005},
+  publisher={Elsevier}
+}
+
+
+@inproceedings{Gilbert2002SummarizeUniverse,
+  title={How to summarize the universe: Dynamic maintenance of quantiles},
+  author={Gilbert, Anna C and Kotidis, Yannis and Muthukrishnan, S and Strauss, Martin J},
+  booktitle={VLDB'02: Proceedings of the 28th International Conference on Very Large Databases},
+  pages={454--465},
+  year={2002},
+  organization={Elsevier}
+}
+
+
+@inproceedings{PoosalaIoannidis1996EstimationOfQueryDistiributionAndAppInParallel,
+  title={Estimation of query-result distribution and its application in parallel-join load balancing},
+  author={Poosala, Viswanath and Ioannidis, Yannis E and others},
+  booktitle={VLDB},
+  volume={96},
+  pages={3--6},
+  year={1996}
+}
+
+@inproceedings{Indyk2004GeometricProblems,
+author = {Indyk, Piotr},
+title = {Algorithms for Dynamic Geometric Problems over Data Streams},
+year = {2004},
+isbn = {1581138520},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/1007352.1007413},
+doi = {10.1145/1007352.1007413},
+booktitle = {Proceedings of the Thirty-Sixth Annual ACM Symposium on Theory of Computing},
+pages = {373–380},
+numpages = {8},
+location = {Chicago, IL, USA},
+series = {STOC '04}
+}
+
+
+@inproceedings{Cranor2003Gigascope,
+author = {Cranor, Chuck and Johnson, Theodore and Spataschek, Oliver and Shkapenyuk, Vladislav},
+title = {Gigascope: A Stream Database for Network Applications},
+year = {2003},
+isbn = {158113634X},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/872757.872838},
+doi = {10.1145/872757.872838},
+abstract = {We have developed Gigascope, a stream database for network applications including traffic analysis, intrusion detection, router configuration analysis, network research, network monitoring, and performance monitoring and debugging. Gigascope is undergoing installation at many sites within the AT&T network, including at OC48 routers, for detailed monitoring. In this paper we describe our motivation for and constraints in developing Gigascope, the Gigascope architecture and query language, and performance issues. We conclude with a discussion of stream database research problems we have found in our application.},
+booktitle = {Proceedings of the 2003 ACM SIGMOD International Conference on Management of Data},
+pages = {647–651},
+numpages = {5},
+location = {San Diego, California},
+series = {SIGMOD '03}
+}
+

@@ -1,4 +1,4 @@
-\chapter{Conclusion and open questions}
+\chapter{Conclusion and Open Questions}
 \label{chap:conclusion}
 
 
@@ -9,12 +9,12 @@ Quancurrent's scalability arises from allowing multiple threads to engage concur
 
 Future work may leverage this observation to achieve high scalability in other sketches or approximation algorithms.
 
-Another direction for future work is using a Quantiles sketch to implement a search index. Index structures are used when fast data access is needed. Such data structures are critical in practical settings, where the large amounts of underlying data is paired with high search volumes and with a high level of concurrency on the hardware side via tens or even hundreds of parallel threads. 
+Another direction for future work is using a Quantiles sketch to implement a search index. Index structures are used when fast data access is needed. Such data structures are critical in practical settings, where large amounts of underlying data are paired with high search volumes and with a high level of concurrency on the hardware side via tens or even hundreds of parallel threads. 
 
 % Range index structures, like B-Trees, return the location of a value within a key sorted set. It is common for the index always to be stored in the main memory, with the data itself sitting on disk.
-Indexes have been more memory, cache and/or CPU efficient in the past decades. It is common for the index structure always to be stored in the main memory, with the data itself sitting on disk. The B-Tree is a commonly used index structure, which return the location of a value within a key sorted set. 
+Indexes have been more memory, cache, and/or CPU efficient in the past decades. It is common for the index structure always to be stored in the main memory, with the data itself sitting on disk. The B-Tree is a commonly used index structure, which returns the location of a value within a key sorted set. 
 
 Kraska et al.~\cite{case_learned_index} suggested that traditional index structures can be enhanced, or even replaced, with learned models, including deep-learning models, termed \emph{learned indexes}. Continuous function, describing the data distribution, can be used to build more efficient data structures or algorithms. As noted by Kraska et al.~\cite{case_learned_index}, indexes are models. For example, a B-Tree can be considered as a model which takes a key as an input and returns the position of a record within a sorted array. Instead of a B-Tree, they suggested a recursive model index. That is, build a hierarchy of models, where at each stage the model takes the key as an input and based on it picks another model, until the final stage predicts the position.
 
-Quantile sketches can summarize large amounts of data in sub-linear space complexity. Therefore, We can use Quantiles sketches to reduce the memory overhead of an index. Also, Quantiles sketch can be used to approximate the data distribution and optimizing different types of index structures.
+Quantile sketches can summarize large amounts of data in sub-linear space complexity. Therefore, We can use Quantiles sketches to reduce the memory overhead of an index. Also, Quantiles sketch can be used to approximate the data distribution and optimize different types of index structures.
 
